@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
-@Controller('mission-client')
+@Controller('missions')
 export class MissionClientController {}

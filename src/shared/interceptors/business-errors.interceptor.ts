@@ -1,18 +1,21 @@
 import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
 import { catchError, Observable } from 'rxjs';
-import { BusinessError } from '../errors/business-errors';
 
 @Injectable()
 export class BusinessErrorsInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle()
             .pipe(catchError(error => {
-                if (error.type === BusinessError.NOT_FOUND)
-                    throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-                else if (error.type === BusinessError.PRECONDITION_FAILED)
-                    throw new HttpException(error.message, HttpStatus.PRECONDITION_FAILED);
-                else if (error.type === BusinessError.BAD_REQUEST)
-                    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                if (error.httpStatus !== undefined)
+                    throw new HttpException(error.message, error.httpStatus);
+                /*else if (error.code !== undefined) {
+                    if (error.code === '23505')
+                        throw new HttpException(`The value ${error.detail.split('=')[1]} is already in use`, HttpStatus.CONFLICT);
+                    else if (error.code === '23503')
+                        throw new HttpException(`The value (${error.detail}) does not exist`, HttpStatus.NOT_FOUND);
+                }*/
+                if (error.code)
+                    throw new HttpException(`Internal server error [${error.code}]: ${error.detail ? error.detail : error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
                 else
                     throw error;
             }));

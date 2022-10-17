@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventService } from './event.service';
+import { TypeOrmTestingConfig } from '../shared/testing-utils/typeorm-testing-config';
 
 describe('EventService', () => {
   let service: EventService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [...TypeOrmTestingConfig()],
       providers: [EventService],
     }).compile();
 

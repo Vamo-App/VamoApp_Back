@@ -8,7 +8,7 @@ export class Tag {
     @PrimaryColumn()
     tag: string;
 
-    @ManyToOne(type => Weight, weight => weight.tag)
+    @OneToMany(type => Weight, weight => weight.tag)
     weights: Weight[];
 
     /*@ManyToMany(type => Place, place => place.tags)

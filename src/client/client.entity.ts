@@ -1,19 +1,26 @@
-import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne, ManyToMany } from 'typeorm';
-/*import { Rank } from '../rank/rank.entity';
-import { MissionClient } from '../mission-client/mission-client.entity';*/
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Rank } from '../rank/rank.entity';
+import { MissionClient } from '../mission-client/mission-client.entity';
 import { Weight } from '../weight/weight.entity';
-/*import { Publication } from '../publication/publication.entity';
+import { Post } from '../post/post.entity';
 import { Review } from '../review/review.entity';
-import { Place} from '../place/place.entity';*/
+import { Place} from '../place/place.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Client {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
+
+    @Column({
+        unique: true
+    })
     email: string;
     
     @Column()
     name: string;
 
+    @Exclude({ toPlainOnly: true })
     @Column()
     password: string;
 
@@ -23,27 +30,31 @@ export class Client {
     @Column()
     description: string;
 
-    @Column()
+    @Column({
+        default: 0
+    })
     xp: number;
 
-    /*@ManyToOne(type => Rank, rank => rank.clients)
+    @ManyToOne(type => Rank, rank => rank.clients)
     rank: Rank;
 
     @OneToMany(type => MissionClient, mission => mission.client)
-    missions: MissionClient[];*/
+    missions: MissionClient[];
 
     @OneToMany(type => Weight, weight => weight.client)
     weights: Weight[];
 
-    /*@OneToMany(type => Publication, publication => publication.client)
-    publications: Publication[];
+    @OneToMany(type => Post, post => post.client)
+    posts: Post[];
 
     @ManyToOne(type => Review, review => review.client)
     reviews: Review[];
 
     @ManyToMany(type => Place, place => place.clientsPending)
+    @JoinTable()
     pending: Place[];
     
     @ManyToMany(type => Place, place => place.clientsLiked)
-    liked: Place[];*/
+    @JoinTable()
+    liked: Place[];
 }

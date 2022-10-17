@@ -1,10 +1,4 @@
-export function BusinessLogicException(message: string, type: number) {
+export function BusinessLogicException(message: string|Record<string, any>, httpStatus: number) {
   this.message = message;
-  this.type = type;
-}
-
-export enum BusinessError {
-  NOT_FOUND,
-  PRECONDITION_FAILED,
-  BAD_REQUEST
+  this.httpStatus = httpStatus;
 }

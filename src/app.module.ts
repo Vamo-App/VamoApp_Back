@@ -17,6 +17,17 @@ import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
+    ClientModule, 
+    WeightModule, 
+    TagModule, 
+    RankModule, 
+    MissionClientModule, 
+    MissionModule, 
+    BusinessModule, PostModule, 
+    PlaceModule, 
+    ReviewModule, 
+    EventModule, 
+    MediaModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -28,18 +39,9 @@ import { MediaModule } from './media/media.module';
       dropSchema: true,
       synchronize: true,
       keepConnectionAlive: true,
+      migrations: [__dirname + '/migrations/*.{js,ts}'],
+      migrationsRun: true
     }),
-    ClientModule, 
-    WeightModule, 
-    TagModule, 
-    RankModule, 
-    MissionClientModule, 
-    MissionModule, 
-    BusinessModule, PostModule, 
-    PlaceModule, 
-    ReviewModule, 
-    EventModule, 
-    MediaModule
   ],
   controllers: [AppController],
   providers: [AppService],

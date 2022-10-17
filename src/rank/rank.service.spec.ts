@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RankService } from './rank.service';
+import { TypeOrmTestingConfig } from '../shared/testing-utils/typeorm-testing-config';
 
 describe('RankService', () => {
   let service: RankService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [...TypeOrmTestingConfig()],
       providers: [RankService],
     }).compile();
 
