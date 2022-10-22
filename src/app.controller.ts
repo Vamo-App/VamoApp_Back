@@ -21,4 +21,9 @@ export class AppController {
     //TODO B
     return ;
   }
+
+  @Get('')
+  async getHello(): Promise<string> {
+    return this.appService.getHello();
+  }
 }
