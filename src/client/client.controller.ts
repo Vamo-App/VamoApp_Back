@@ -1,4 +1,4 @@
-import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, ClassSerializerInterceptor } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
@@ -13,6 +13,7 @@ import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
 import { PostCreateDto } from '../post/dto';
 import { LocationClass } from '../shared/classes/location';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('clients')
 @UseInterceptors(BusinessErrorsInterceptor, TransformInterceptor)
@@ -33,6 +34,7 @@ export class ClientController {
         return await this.service.register(client);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     async getAll(): Promise<Client[]> {
         return await this.service.getAll();

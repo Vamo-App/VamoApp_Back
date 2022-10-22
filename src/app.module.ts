@@ -15,6 +15,8 @@ import { PlaceModule } from './place/place.module';
 import { ReviewModule } from './review/review.module';
 import { EventModule } from './event/event.module';
 import { MediaModule } from './media/media.module';
+import { VamoUserModule } from './vamo-user/vamo-user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { MediaModule } from './media/media.module';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
+    VamoUserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
