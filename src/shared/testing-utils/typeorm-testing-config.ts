@@ -17,7 +17,7 @@ export const TypeOrmTestingConfig = () => [
     type: 'sqlite',
     database: ':memory:',
     dropSchema: true,
-    entities: [Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review],
+    entities: [Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review, Mission, MissionClient, Post],
     synchronize: true,
     keepConnectionAlive: true
   }),

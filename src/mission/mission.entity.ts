@@ -27,7 +27,7 @@ export class Mission {
     @Column()
     base: boolean;
 
-    @OneToMany(type => MissionClient, mission => mission.mission)
+    @OneToMany(type => MissionClient, missionClient => missionClient.mission)
     instances: MissionClient[];
 
     @ManyToMany(type => Place, place => place.placeMissions)

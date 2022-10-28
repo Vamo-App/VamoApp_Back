@@ -48,15 +48,15 @@ export class ClientService {
         for (const weight of client.weights) {
             const tag = await this.tagRepository.findOne({ where: {tag: weight.tag.tag} });
             if (!tag) {
-                console.log(tag);
                 weight.tag = await this.tagRepository.save(weight.tag);
             }
         }
-        // TODO T DEMASIADO DENSO ESTE ERROR, pero si borro las 4 líneas de abajo, funciona sin crear los weights
+        
+        /*// TODO T DEMASIADO DENSO ESTE ERROR, pero si borro las 4 líneas de abajo, funciona sin crear los weights
         for (const weight of clientSaved.weights) {
             weight.client = clientSaved;
             await this.weightRepository.save(weight);
-        }
+        }*/
 
         return clientSaved;
     }

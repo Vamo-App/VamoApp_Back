@@ -1,12 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsUrl, MinLength, Matches } from 'class-validator';
 
 export class BusinessUpdateDto {
     @IsString()
     @IsNotEmpty()
     readonly type: string;
 
-    @IsString()
+    @IsEmail()
     @IsNotEmpty()
     @Transform(({value}) => value.toLowerCase())
     readonly email: string;
@@ -16,6 +16,8 @@ export class BusinessUpdateDto {
     readonly name: string;
 
     @IsString()
+    @MinLength(8)
+    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak'})
     @IsNotEmpty()
     readonly password: string;
 
