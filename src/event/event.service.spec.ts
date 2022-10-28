@@ -4,6 +4,7 @@ import { TypeOrmTestingConfig } from '../shared/testing-utils/typeorm-testing-co
 
 describe('EventService', () => {
   let service: EventService;
+  jest.setTimeout(30000);
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

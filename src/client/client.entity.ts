@@ -20,7 +20,9 @@ export class Client {
     @Column()
     name: string;
 
-    @Exclude({ toPlainOnly: true })
+    @Exclude({ 
+        toPlainOnly: true 
+    })
     @Column()
     password: string;
 

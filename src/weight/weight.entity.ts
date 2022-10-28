@@ -7,7 +7,9 @@ export class Weight {
     @PrimaryGeneratedColumn("uuid")
     id: string;
     
-    @Column()
+    @Column({ 
+        type: "float"
+    })
     weight: number;
 
     @ManyToOne(type => Client, client => client.weights)

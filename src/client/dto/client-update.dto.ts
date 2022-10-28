@@ -1,8 +1,10 @@
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class ClientUpdateDto {
     @IsString()
     @IsNotEmpty()
+    @Transform(({value}) => value.toLowerCase())
     readonly email: string;
 
     @IsString()

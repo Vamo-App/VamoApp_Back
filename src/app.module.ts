@@ -17,10 +17,14 @@ import { EventModule } from './event/event.module';
 import { MediaModule } from './media/media.module';
 import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
+import { MediaTypeModule } from './shared/enums/media-type.module';
+import { MissionTypeModule } from './shared/enums/mission-type.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    MediaTypeModule,
+    MissionTypeModule,
     ClientModule, 
     WeightModule, 
     TagModule, 

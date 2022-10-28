@@ -25,5 +25,4 @@ export class AuthService {
             token: this.jwtService.sign(payload, { privateKey: process.env.JWT_SECRET }),
         };
     }
-
 }

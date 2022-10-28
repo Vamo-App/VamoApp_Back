@@ -1,4 +1,11 @@
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class ReviewUpdateDto {
-    //TODO D
+    @IsString()
+    @IsNotEmpty()
+    readonly text: string;
+
+    @IsNumber()
+    @IsNotEmpty()
+    readonly stars: number;
 }
