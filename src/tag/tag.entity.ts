@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, ManyToOne, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Weight } from '../weight/weight.entity';
 import { Place } from '../place/place.entity';
 import { Mission } from '../mission/mission.entity';
@@ -12,6 +12,7 @@ export class Tag {
     weights: Weight[];
 
     @ManyToMany(type => Place, place => place.tags)
+    @JoinTable()
     places: Place[];
 
     @OneToMany(type => Mission, mission => mission.tag)

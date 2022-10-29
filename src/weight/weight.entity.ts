@@ -12,9 +12,13 @@ export class Weight {
     })
     weight: number;
 
-    @ManyToOne(type => Client, client => client.weights)
+    @ManyToOne(type => Client, client => client.weights, {
+        onDelete: 'CASCADE'
+    })
     client: Client;
 
-    @ManyToOne(type => Tag, tag => tag.weights)
+    @ManyToOne(type => Tag, tag => tag.weights, {
+        onDelete: 'CASCADE'
+    })
     tag: Tag;
 }

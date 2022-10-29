@@ -3,6 +3,7 @@ import { VamoUser } from './vamo-user';
 
 @Injectable()
 export class VamoUserService {
+    //TODO Definir la entidad VamoUser (que se puedan crear a la DB)
     private users: VamoUser[] = [
         new VamoUser(1, process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD, ["admin"])
     ];

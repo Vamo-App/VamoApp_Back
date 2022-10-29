@@ -14,9 +14,13 @@ export class Media {
     @Column()
     type: MediaType;
 
-    @ManyToOne(type => Event, event => event.medias)
+    @ManyToOne(type => Event, event => event.medias, {
+        onDelete: 'CASCADE'
+    })
     event: Event;
 
-    @ManyToOne(type => Place, place => place.medias)
+    @ManyToOne(type => Place, place => place.medias, {
+        onDelete: 'CASCADE'
+    })
     place: Place;
 }

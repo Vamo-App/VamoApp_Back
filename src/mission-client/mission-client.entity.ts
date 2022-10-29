@@ -12,9 +12,13 @@ export class MissionClient {
     })
     percentage: number;
     
-    @ManyToOne(type => Client, client => client.missions)
+    @ManyToOne(type => Client, client => client.missions, {
+        onDelete: 'CASCADE'
+    })
     client: Client;
 
-    @ManyToOne(type => Mission, mission => mission.instances)
+    @ManyToOne(type => Mission, mission => mission.instances, {
+        onDelete: 'CASCADE' // !! Esto casi nunca debería pasar; casi nunca se debería borrar una misión
+    })
     mission: Mission;
 }

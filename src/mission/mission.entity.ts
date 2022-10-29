@@ -33,6 +33,8 @@ export class Mission {
     @ManyToMany(type => Place, place => place.placeMissions)
     places: Place[];
 
-    @ManyToOne(type => Tag, tag => tag.tagMissions)
+    @ManyToOne(type => Tag, tag => tag.tagMissions, {
+        onDelete: 'CASCADE'
+    })
     tag: Tag;
 }

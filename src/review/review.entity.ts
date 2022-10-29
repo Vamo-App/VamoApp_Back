@@ -15,9 +15,13 @@ export class Review {
     })
     stars: number;
 
-    @ManyToOne(type => Client, client => client.reviews)
+    @ManyToOne(type => Client, client => client.reviews, {
+        onDelete: 'CASCADE'
+    })
     client: Client;
 
-    @ManyToOne(type => Place, place => place.reviews)
+    @ManyToOne(type => Place, place => place.reviews, {
+        onDelete: 'CASCADE'
+    })
     place: Place;
 }

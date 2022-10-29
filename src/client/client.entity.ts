@@ -49,7 +49,7 @@ export class Client {
     @OneToMany(type => Post, post => post.client)
     posts: Post[];
 
-    @ManyToOne(type => Review, review => review.client)
+    @OneToMany(type => Review, review => review.client)
     reviews: Review[];
 
     @ManyToMany(type => Place, place => place.clientsPending)

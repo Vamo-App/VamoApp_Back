@@ -25,7 +25,9 @@ export class Event {
     @Column()
     url: string;
 
-    @ManyToOne(type => Place, place => place.events)
+    @ManyToOne(type => Place, place => place.events, {
+        onDelete: 'CASCADE'
+    })
     place: Place;
 
     @OneToMany(type => Media, media => media.event)

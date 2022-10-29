@@ -1,4 +1,4 @@
-import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, ClassSerializerInterceptor, Query } from '@nestjs/common';
+import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
@@ -36,8 +36,8 @@ export class ClientController {
     }
 
     @Get()
-    async getAll(@Query() query): Promise<Client[]> {
-        return await this.service.getAll(query.q);
+    async getAll(@Query('q') q:string): Promise<Client[]> {
+        return await this.service.getAll(q);
     }
 
     @Get(':clientId')
@@ -84,8 +84,8 @@ export class ClientController {
     }
 
     @Post(':clientId/liked/:placeId')
-    async addLiked(@Param('clientId') clientId: string): Promise<Place> {
-        return await this.service.addLiked(clientId);
+    async addLiked(@Param('clientId') clientId: string, @Param('placeId') placeId: string): Promise<Place> {
+        return await this.service.addLiked(clientId, placeId);
     }
 
     @Delete(':clientId/liked/:placeId')
@@ -106,6 +106,7 @@ export class ClientController {
     }
 
     @Delete(':clientId/posts/:postId')
+    @HttpCode(204)
     async removePost(@Param('clientId') clientId: string, @Param('postId') postId: string): Promise<PostEntity> {
         return await this.service.removePost(clientId, postId);
     }

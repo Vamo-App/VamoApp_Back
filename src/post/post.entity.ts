@@ -16,9 +16,13 @@ export class Post {
     @Column()
     visible: boolean;
 
-    @ManyToOne(type => Client, client => client.posts)
+    @ManyToOne(type => Client, client => client.posts, {
+        onDelete: 'CASCADE'
+    })
     client: Client;
 
-    @ManyToOne(type => Place, place => place.posts)
+    @ManyToOne(type => Place, place => place.posts, {
+        onDelete: 'CASCADE' // TODO ? Si se borra un lugar, se deberían borrar todos los posts de ese lugar?
+    })
     place: Place;
 }
