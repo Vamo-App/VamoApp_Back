@@ -105,6 +105,8 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['reviews'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        if (!client.reviews.length)
+            throw new BusinessLogicException(`The client with the id (${clientId}) has no reviews`, HttpStatus.NO_CONTENT);
         return client.reviews;
     }
 
@@ -112,6 +114,8 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        if (!client.pending.length)
+            throw new BusinessLogicException(`The client with the id (${clientId}) has no pending places`, HttpStatus.NO_CONTENT);
         return client.pending;
     }
 
@@ -143,6 +147,8 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        if (!client.liked.length)
+            throw new BusinessLogicException(`The client with the id (${clientId}) has no liked places`, HttpStatus.NO_CONTENT);
         return client.liked;
     }
 
@@ -174,6 +180,8 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        if (!client.posts.length)
+            throw new BusinessLogicException(`The client with the id (${clientId}) has no posts`, HttpStatus.NO_CONTENT);
         return client.posts;
     }
 
@@ -181,7 +189,11 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        const place = await this.placeRepository.findOne({ where: {id: post.place.id} });
+        if (!place)
+            throw new BusinessLogicException(`The place with the id (${post.place.id}) was not found`, HttpStatus.NOT_FOUND);
         post.client = client;
+        post.place = place;
         const newPost = await this.postRepository.save(post);
         return newPost;
     }
@@ -206,6 +218,8 @@ export class ClientService {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['missions'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
+        if (!client.missions.length)
+            throw new BusinessLogicException(`The client with the id (${clientId}) has no missions`, HttpStatus.NO_CONTENT);
         return client.missions;
     }
 

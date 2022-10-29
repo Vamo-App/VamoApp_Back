@@ -101,7 +101,10 @@ export class ClientController {
 
     @Post(':clientId/posts')
     async publishPost(@Param('clientId') clientId: string, @Body() postCreateDto: PostCreateDto): Promise<PostEntity> {
+        const place: Place = new Place();
+        place.id = postCreateDto.placeId;
         const post: PostEntity = plainToInstance(PostEntity, postCreateDto);
+        post.place = place;
         return await this.service.publishPost(clientId, post);
     }
 
@@ -120,4 +123,6 @@ export class ClientController {
     async reportLocationToAccomplishMissions(@Param('clientId') clientId: string, @Body() location:LocationClass): Promise<MissionClient[]> {
         return await this.service.reportLocationToAccomplishMissions(clientId, location);
     }
+
+    // TODO T todos funcionan bien (ya lo comprobé por PSQL), pero hacen falta los test de postman desde 'getReviews' (no se pueden probar aun)
 }
