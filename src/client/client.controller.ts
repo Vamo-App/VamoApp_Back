@@ -1,4 +1,4 @@
-import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, ClassSerializerInterceptor, Query } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
@@ -16,6 +16,7 @@ import { LocationClass } from '../shared/classes/location';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('clients')
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(BusinessErrorsInterceptor, TransformInterceptor)
 export class ClientController {
     constructor(private readonly service: ClientService) {}
@@ -34,15 +35,9 @@ export class ClientController {
         return await this.service.register(client);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get()
-    async getAll(): Promise<Client[]> {
-        return await this.service.getAll();
-    }
-
-    @Get('?q=:q')
-    async getAllFiltered(@Param('q') q: string): Promise<Client[]> {
-        return await this.service.getAllFiltered(q);
+    async getAll(@Query() query): Promise<Client[]> {
+        return await this.service.getAll(query.q);
     }
 
     @Get(':clientId')

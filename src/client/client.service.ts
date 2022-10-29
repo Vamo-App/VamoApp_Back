@@ -38,41 +38,35 @@ export class ClientService {
             }
         }
 
+        //TODO T settear el rank al rango inicial
         //TODO T settear como instancias de misiones, todas las misiones que tengan base=true
 
         const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
         if (clientFound)
             throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
-        const clientSaved: Client = await this.clientRepository.save(client)
         for (const weight of client.weights) {
             const tag = await this.tagRepository.findOne({ where: {tag: weight.tag.tag} });
             if (!tag) {
                 weight.tag = await this.tagRepository.save(weight.tag);
             }
-        }
-        
-        /*// TODO T DEMASIADO DENSO ESTE ERROR, pero si borro las 4 líneas de abajo, funciona sin crear los weights
-        for (const weight of clientSaved.weights) {
-            weight.client = clientSaved;
             await this.weightRepository.save(weight);
-        }*/
+        }
 
-        return clientSaved;
+        return await this.clientRepository.save(client);
     }
 
-    async getAll(): Promise<Client[]> {
-        return await this.clientRepository.find({ relations: ['rank', 'weights'] });
-    }
-
-    async getAllFiltered(q: string): Promise<Client[]> {
-        //TODO T
-        return this.getAll();
+    async getAll(q: string): Promise<Client[]> {
+        let clients = await this.clientRepository.find({ relations: ['rank', 'weights'] });
+        clients = clients.filter(client => client.name.toLowerCase().includes(q.toLowerCase()));
+        if (!clients.length)
+            throw new BusinessLogicException(`No clients were found with the query (${q})`, HttpStatus.NO_CONTENT);
+        return clients;
     }
 
     async getOne(clientId: string): Promise<Client> {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['rank'] });
-        if (client === undefined)
+        if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         return client;
     }
