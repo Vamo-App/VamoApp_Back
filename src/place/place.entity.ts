@@ -22,17 +22,31 @@ export class Place {
     picture: string;
 
     @Column()
+    country: string;
+
+    @Column()
+    state: string;
+
+    @Column()
+    city: string;
+
+    @Column({
+        nullable: true
+    })
+    neighborhood: string;
+
+    @Column()
     address: string;
+    
+    @Column({ 
+        type: "float"
+    })
+    latitude: number;
 
     @Column({ 
         type: "float"
     })
     longitude: number;
-
-    @Column({ 
-        type: "float"
-    })
-    latitude: number;
 
     @Column({
         nullable: true

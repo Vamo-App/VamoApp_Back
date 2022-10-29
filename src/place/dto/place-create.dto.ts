@@ -1,4 +1,5 @@
-import { IsOptional, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsNotEmpty, IsString, IsUrl, ArrayNotEmpty, IsNumber } from 'class-validator';
 
 export class PlaceCreateDto {
     @IsString()
@@ -11,7 +12,31 @@ export class PlaceCreateDto {
 
     @IsString()
     @IsNotEmpty()
+    readonly country: string;
+
+    @IsString()
+    @IsNotEmpty()
+    readonly state: string;
+
+    @IsString()
+    @IsNotEmpty()
+    readonly city: string;
+
+    @IsString()
+    @IsOptional()
+    readonly neighborhood: string;
+
+    @IsString()
+    @IsNotEmpty()
     readonly address: string;
+
+    @IsNumber()
+    @IsOptional()
+    readonly latitude: number;
+
+    @IsNumber()
+    @IsOptional()
+    readonly longitude: number;
 
     @IsString()
     @IsOptional()
@@ -36,4 +61,10 @@ export class PlaceCreateDto {
     @IsString()
     @IsOptional()
     readonly businessId: string;
+
+    @IsNotEmpty()
+    @ArrayNotEmpty({ message: 'You must provide at least one tag' })
+    @Transform(({value}) => value.map(tag => tag.toLowerCase()))
+    readonly tags: string[];
 }
+ 

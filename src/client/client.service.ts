@@ -11,7 +11,10 @@ import { Mission } from '../mission/mission.entity';
 import { Place } from '../place/place.entity';
 import { Review } from '../review/review.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
+import { Rank } from '../rank/rank.entity';
 import { LocationClass } from '../shared/classes/location';
+import { entitiesConstants } from '../shared/constants';
+import { MissionType } from '../shared/enums/mission-type.enum';
 
 @Injectable()
 export class ClientService {
@@ -32,6 +35,8 @@ export class ClientService {
         private readonly reviewRepository: Repository<Review>,
         @InjectRepository(MissionClient)
         private readonly missionClientRepository: Repository<MissionClient>,
+        @InjectRepository(Rank)
+        private readonly rankRepository: Repository<Rank>,
     ) {}
 
     async register(client: Client): Promise<Client> {
@@ -46,9 +51,26 @@ export class ClientService {
             }
         }
 
-        //TODO T settear el rank al rango inicial, hacer esto cuando ya estén hechas las migraciones
-        //TODO T settear como instancias de misiones, todas las misiones que tengan base=true
+        // settear el rango 0 por defecto, si no existe, crearlo
+        let rank = await this.rankRepository.findOne({ where: { level:0 } });
+        if (!rank) {
+            rank = entitiesConstants.DEFAULT_RANK;
+            await this.rankRepository.save(rank);
+        }
+        client.rank = rank;
 
+        // settear como instancias de misiones (0% completado), todas las misiones que tengan base=true
+        const missionsFound = await this.missionRepository.find({ where: { base: true } });
+        client.missions = [];
+        for (const mission of missionsFound) {
+            let missionClient: MissionClient = new MissionClient();
+            missionClient.percentage = 0.0;
+            missionClient.mission = mission;
+            missionClient = await this.missionClientRepository.save(missionClient);
+            client.missions.push(missionClient);
+        }
+
+        // crear todos los pesos que se hayan indicado (peso de 100%) y si no existen los tags, crearlos también
         for (const weight of client.weights) {
             const tag = await this.tagRepository.findOne({ where: {tag: weight.tag.tag} });
             if (!tag) 
@@ -120,25 +142,31 @@ export class ClientService {
     }
 
     async addPending(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: placeId} });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
         client.pending.push(place);
+
+        // TODO B actualizar los pesos del cliente
+
         await this.clientRepository.save(client);
         return place;
     }
 
     async removePending(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: placeId} });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
         client.pending = client.pending.filter(p => p.id !== place.id);
+
+        // TODO B actualizar los pesos del cliente
+
         await this.clientRepository.save(client);
         return place;
     }
@@ -153,25 +181,31 @@ export class ClientService {
     }
 
     async addLiked(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: placeId} });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
         client.liked.push(place);
+
+        // TODO B actualizar los pesos del cliente
+
         await this.clientRepository.save(client);
         return place;
     }
 
     async removeLiked(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: placeId} });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
         client.liked = client.liked.filter(p => p.id !== place.id);
+
+        // TODO B actualizar los pesos del cliente
+
         await this.clientRepository.save(client);
         return place;
     }
@@ -186,7 +220,7 @@ export class ClientService {
     }
 
      async publishPost(clientId: string, post:Post): Promise<Post> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
+        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts', 'missions', 'weights', 'rank'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: post.place.id} });
@@ -195,6 +229,9 @@ export class ClientService {
         post.client = client;
         post.place = place;
         const newPost = await this.postRepository.save(post);
+
+        // TODO T actualizar el % de las instancias de misiones del cliente, si es el 100%, se le suma el XP al usuario y si tiene suficiente XP para subir de rango, se actualiza el rango
+
         return newPost;
     }
 

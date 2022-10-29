@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsUrl } from 'class-validator';
 
 export class PlaceUpdateDto {
     @IsString()
@@ -11,7 +11,31 @@ export class PlaceUpdateDto {
 
     @IsString()
     @IsOptional()
+    readonly country: string;
+
+    @IsString()
+    @IsOptional()
+    readonly state: string;
+
+    @IsString()
+    @IsOptional()
+    readonly city: string;
+
+    @IsString()
+    @IsOptional()
+    readonly neighborhood: string;
+
+    @IsString()
+    @IsOptional()
     readonly address: string;
+
+    @IsNumber()
+    @IsOptional()
+    readonly latitude: number;
+
+    @IsNumber()
+    @IsOptional()
+    readonly longitude: number;
 
     @IsString()
     @IsOptional()

@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Place } from '../place/place.entity';
@@ -31,6 +31,7 @@ export class Mission {
     instances: MissionClient[];
 
     @ManyToMany(type => Place, place => place.placeMissions)
+    @JoinTable()
     places: Place[];
 
     @ManyToOne(type => Tag, tag => tag.tagMissions, {
