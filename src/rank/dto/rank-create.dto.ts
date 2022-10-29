@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { Min, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class RankCreateDto {
     @IsString()
@@ -6,6 +6,7 @@ export class RankCreateDto {
     readonly name: string;
 
     @IsNumber()
+    @Min(0)
     @IsNotEmpty()
     readonly level: number;
 

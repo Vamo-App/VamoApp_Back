@@ -1,15 +1,11 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class RankUpdateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly name: string;
 
     @IsNumber()
-    @IsNotEmpty()
-    readonly level: number;
-
-    @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     readonly xpNext: number;
 }

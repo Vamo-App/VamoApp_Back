@@ -35,21 +35,19 @@ export class ClientService {
     ) {}
 
     async register(client: Client): Promise<Client> {
+        const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
+        if (clientFound)
+            throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
         for (const item in client) {
             if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1) {
-                console.log(item);
-                if (client[item] !== undefined)
+                if (client[item])
                     throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
             }
         }
 
         //TODO T settear el rank al rango inicial, hacer esto cuando ya estén hechas las migraciones
         //TODO T settear como instancias de misiones, todas las misiones que tengan base=true
-
-        const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
-        if (clientFound)
-            throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
         for (const weight of client.weights) {
             const tag = await this.tagRepository.findOne({ where: {tag: weight.tag.tag} });
@@ -66,7 +64,7 @@ export class ClientService {
         if (q)
             clients = clients.filter(client => client.name.toLowerCase().includes(q.toLowerCase()));
         if (!clients.length)
-            throw new BusinessLogicException(`No clients were found with the query (${q})`, HttpStatus.NO_CONTENT);
+            throw new BusinessLogicException(`No clients were found`, HttpStatus.NO_CONTENT);
         return clients;
     }
 
@@ -78,25 +76,29 @@ export class ClientService {
     }
 
     async update(clientId: string, client: Client): Promise<Client> {
-        const clientFound = await this.clientRepository.findOne({ where: {id: clientId} });
-        if (!clientFound)
+        const clientToUpdate = await this.clientRepository.findOne({ where: {id: clientId} });
+        if (!clientToUpdate)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        for (const item in client) {
-            if (client[item]) {
-                if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) === -1)
-                    clientFound[item] = client[item];
-                else
-                    throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
-            }
+
+        if (client.email && client.email !== clientToUpdate.email) {
+            const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
+            if (clientFound)
+                throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
         }
-        return await this.clientRepository.save(clientFound);
+
+        for (const item in client) {
+            if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1)
+                if (client[item])
+                    throw new BusinessLogicException(`The field ${item} cannot be manually modified`, HttpStatus.FORBIDDEN);
+        }
+        return await this.clientRepository.save({...clientToUpdate, ...client});
     }
 
     async delete(clientId: string): Promise<void> {
         const client = await this.clientRepository.findOne({ where: {id: clientId} });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        await this.clientRepository.delete({ id: clientId });
+        await this.clientRepository.remove(client);
     }
 
     async getReviews(clientId: string): Promise<Review[]> {

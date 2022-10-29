@@ -6,7 +6,9 @@ export class Rank {
     @PrimaryColumn()
     name: string;
 
-    @Column()
+    @Column({
+        unique: true
+    })
     level: number;
 
     @Column()

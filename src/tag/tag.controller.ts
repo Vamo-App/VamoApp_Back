@@ -1,7 +1,7 @@
 import { Controller, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TagService } from './tag.service';
-import { Tag } from '../tag/tag.entity';
+import { Tag } from './tag.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('tags')
