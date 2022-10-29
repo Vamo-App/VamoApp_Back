@@ -1,24 +1,23 @@
-import { IsNotEmpty, IsString, IsNumber, IsEnum, IsBoolean } from 'class-validator';
-import { MissionType } from '../../shared/enums/mission-type.enum';
+import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
 
 export class MissionUpdateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly name: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 
     @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     readonly prizeXp: number;
 
     @IsNumber()
-    @IsNotEmpty()
+    @IsOptional()
     readonly requiredN: number;
 
     @IsBoolean()
-    @IsNotEmpty()
+    @IsOptional()
     readonly base: boolean;
 }

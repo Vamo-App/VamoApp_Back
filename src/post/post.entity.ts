@@ -7,13 +7,17 @@ export class Post {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     description: string;
 
     @Column()
     picture: string;
 
-    @Column()
+    @Column({
+        default: true
+    })
     visible: boolean;
 
     @ManyToOne(type => Client, client => client.posts, {

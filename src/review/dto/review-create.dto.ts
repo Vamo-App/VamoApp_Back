@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class ReviewCreateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly text: string;
 
     @IsNumber()

@@ -22,7 +22,9 @@ export class Event {
     @Column()
     endDate: Date;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     url: string;
 
     @ManyToOne(type => Place, place => place.events, {

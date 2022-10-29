@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsDateString, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class EventCreateDto {
     @IsString()
@@ -22,6 +22,6 @@ export class EventCreateDto {
     readonly endDate: string;
 
     @IsUrl()
-    @IsNotEmpty()
+    @IsOptional()
     readonly url: string;
 }

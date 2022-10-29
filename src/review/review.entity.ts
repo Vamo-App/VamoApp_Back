@@ -7,7 +7,9 @@ export class Review {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     text: string;
 
     @Column({ 

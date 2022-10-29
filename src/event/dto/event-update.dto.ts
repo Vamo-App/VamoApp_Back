@@ -1,27 +1,27 @@
-import { IsDateString, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class EventUpdateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly title: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly type: string;
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly startDate: string;
 
     @IsDateString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly endDate: string;
 
     @IsUrl()
-    @IsNotEmpty()
+    @IsOptional()
     readonly url: string;
 }

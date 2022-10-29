@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, IsEmail, IsUrl, MinLength, Matches, ArrayNotEmpty } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsEmail, IsUrl, MinLength, Matches, ArrayNotEmpty } from 'class-validator';
 
 export class ClientCreateDto {
     @IsEmail()
@@ -18,11 +18,11 @@ export class ClientCreateDto {
     readonly password: string;
 
     @IsUrl()
-    @IsNotEmpty()
+    @IsOptional()
     readonly picture: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 
     @IsNotEmpty()

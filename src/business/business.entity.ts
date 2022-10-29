@@ -24,7 +24,9 @@ export class Business {
     @Column()
     password: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     picture: string;
     
     @OneToMany(type => Place, place => place.business)

@@ -26,10 +26,14 @@ export class Client {
     @Column()
     password: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     picture: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     description: string;
 
     @Column({

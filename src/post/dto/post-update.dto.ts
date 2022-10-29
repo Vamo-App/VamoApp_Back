@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsString, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class PostUpdateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 
     @IsBoolean()
-    @IsNotEmpty()
+    @IsOptional()
     readonly visible: boolean;
 }

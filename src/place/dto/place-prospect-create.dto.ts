@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class PlaceProspectCreateDto {
     @IsString()
@@ -6,7 +6,7 @@ export class PlaceProspectCreateDto {
     readonly name: string;
 
     @IsUrl()
-    @IsNotEmpty()
+    @IsOptional()
     readonly picture: string;
 
     @IsString()
@@ -14,18 +14,22 @@ export class PlaceProspectCreateDto {
     readonly address: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly phone: string;
 
     @IsUrl()
+    @IsOptional()
     readonly website: string;
 
     @IsUrl()
+    @IsOptional()
     readonly facebook: string;
 
     @IsUrl()
+    @IsOptional()
     readonly instagram: string;
 
     @IsUrl()
+    @IsOptional()
     readonly tiktok: string;
 }

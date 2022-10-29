@@ -16,7 +16,9 @@ export class Place {
     @Column()
     name: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     picture: string;
 
     @Column()
@@ -32,10 +34,14 @@ export class Place {
     })
     latitude: number;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     phone: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     website: string;
 
     @Column({ 
@@ -43,13 +49,19 @@ export class Place {
     })
     average: number;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     facebook: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     instagram: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     tiktok: string;
 
     @Column()

@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class PostCreateDto {
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 
     @IsUrl()
