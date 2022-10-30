@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Place } from '../place/place.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Business {
+export class Business extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

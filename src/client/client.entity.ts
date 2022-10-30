@@ -6,9 +6,10 @@ import { Post } from '../post/post.entity';
 import { Review } from '../review/review.entity';
 import { Place} from '../place/place.entity';
 import { Exclude } from 'class-transformer';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Client {
+export class Client extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

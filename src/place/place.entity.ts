@@ -8,9 +8,10 @@ import { Mission } from '../mission/mission.entity';
 import { Media } from '../media/media.entity';
 import { Event } from '../event/event.entity';
 import { Country } from '../shared/enums/country.enum';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Place {
+export class Place extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
     

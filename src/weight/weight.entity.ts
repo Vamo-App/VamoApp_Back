@@ -1,9 +1,10 @@
 import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Client } from '../client/client.entity';
 import { Tag } from '../tag/tag.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Weight {
+export class Weight extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
     

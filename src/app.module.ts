@@ -17,6 +17,7 @@ import { EventModule } from './event/event.module';
 import { MediaModule } from './media/media.module';
 import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
+import { LogModule } from './log/log.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AuthModule } from './auth/auth.module';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
+    LogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

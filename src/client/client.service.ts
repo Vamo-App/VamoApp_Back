@@ -13,7 +13,7 @@ import { Review } from '../review/review.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Rank } from '../rank/rank.entity';
 import { LocationClass } from '../shared/utils/location';
-import { entitiesConstants } from '../shared/constants';
+import { entitiesConstants } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 
 @Injectable()

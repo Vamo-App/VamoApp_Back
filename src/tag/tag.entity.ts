@@ -2,9 +2,10 @@ import { Entity, PrimaryColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm
 import { Weight } from '../weight/weight.entity';
 import { Place } from '../place/place.entity';
 import { Mission } from '../mission/mission.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Tag {
+export class Tag extends BaseEntity {
     @PrimaryColumn()
     tag: string;
 

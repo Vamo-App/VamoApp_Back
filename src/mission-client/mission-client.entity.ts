@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Client } from '../client/client.entity';
 import { Mission } from '../mission/mission.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class MissionClient {
+export class MissionClient extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

@@ -12,8 +12,8 @@ import { Post } from '../post/post.entity';
 import { Event } from '../event/event.entity';
 import { Media } from '../media/media.entity';
 import { RequestInfo, RequestInit } from 'node-fetch';
-import { minimumRadius } from '../shared/constants';
-import { distance } from '../shared/utils/functions';
+import { minimumRadius } from '../shared/utils/constants';
+import { LogService } from '../log/log.service';
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
   import('node-fetch').then(({ default: fetch }) => fetch(url, init));
@@ -35,6 +35,7 @@ export class PlaceService {
         private readonly eventRepository: Repository<Event>,
         @InjectRepository(Media)
         private readonly mediaRepository: Repository<Media>,
+        private readonly log: LogService
     ) {}
 
     async createProspect(place: Place): Promise<Place> {
@@ -82,28 +83,20 @@ export class PlaceService {
                 access_key: process.env.POSITIONSTACK_API_KEY,
                 query: fullAddress
             });
-            console.log(`positionstack API consumed at endpoint: \n'${fetchUrl}'`);
+            this.log.info(`PositionStack API consumed at endpoint: \n'${fetchUrl}'`, 'Create Place');
+            return ; // DELETE this
             const response: any = await fetch(`${fetchUrl}`)
                     .then(res => {
                         status = res.status;
                         return res.json();
                     });
             if (status !== 200) {
-                // TODO T crear log dependiendo del status: https://positionstack.com/documentation
-                /**
-                status = 401
-                {
-                    "error": {
-                        "code": "invalid_access_key",
-                        "message": "You have not supplied a valid API Access Key. [Technical Support: support@apilayer.com]"
-                    }
-                }
-                */
+                this.log.error(`Error status ${status} when calling PositionStack API`, JSON.stringify(response), 'Create Place');
                 throw new BusinessLogicException(`Error in the request to the external API`, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             if (!response || !response.data || !response.data[0] || !response.data[0].latitude || !response.data[0].longitude) {
-                // TODO crear log
+                this.log.warn(`The address '${fullAddress}' was not found by PositionStack API`, JSON.stringify(response), 'Create Place');
                 throw new BusinessLogicException(`The address '${fullAddress}' was not found by the API`, HttpStatus.NOT_FOUND);
             }
             
@@ -118,10 +111,10 @@ export class PlaceService {
                 }
 
                 if (i === -1) {
-                    // TODO T crear log - The address ${place.address} was not found in the country ${place.country} by the API
+                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but any was found in the country`, JSON.stringify(response), 'Create Place');
                     throw new BusinessLogicException(`The address '${fullAddress}' was not found in the country '${place.country}' by the API`, HttpStatus.NOT_FOUND);
                 } else {
-                    // TODO T crear log de que se encontró más de uno, pero sí existe en el país
+                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but at least one found in the country`, JSON.stringify(response), 'Create Place');
                     console.log(`WARNING: The address '${fullAddress}' was found more than once by the API, but it was found in the country '${place.country}'`);
                 }
             }

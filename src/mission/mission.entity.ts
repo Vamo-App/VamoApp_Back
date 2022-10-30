@@ -3,9 +3,10 @@ import { MissionType } from '../shared/enums/mission-type.enum';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Place } from '../place/place.entity';
 import { Tag } from '../tag/tag.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Mission {
+export class Mission extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

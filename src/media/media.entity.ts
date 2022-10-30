@@ -2,9 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { MediaType } from '../shared/enums/media-type.enum';
 import { Place } from '../place/place.entity';
 import { Event } from '../event/event.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Media {
+export class Media extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

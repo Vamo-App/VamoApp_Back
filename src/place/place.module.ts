@@ -9,9 +9,13 @@ import { Business } from '../business/business.entity';
 import { Review } from '../review/review.entity';
 import { Event } from '../event/event.entity';
 import { Media } from '../media/media.entity';
+import { LogModule } from '../log/log.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Place, Tag, Client, Business, Review, Event, Media])],
+  imports: [
+    TypeOrmModule.forFeature([Place, Tag, Client, Business, Review, Event, Media]),
+    LogModule
+  ],
   providers: [PlaceService],
   controllers: [PlaceController]
 })

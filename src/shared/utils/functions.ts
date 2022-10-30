@@ -15,6 +15,12 @@ export const distance = (lat1: number, lon1: number, lat2: number, lon2: number,
     return d;
 }
 
+export var getStackTrace = function() {
+    var obj: any = {};
+    Error.captureStackTrace(obj, getStackTrace);
+    return obj.stack;
+};
+
 // console.log("DISTANCE: " + distance(4.64169, -74.075942,4.640116,-74.076031));
 // expected: 0.17365 km (google maps) , output: 0.17529855129100733 km
 // medium error: 1.6485512910073303 m (for short distances)

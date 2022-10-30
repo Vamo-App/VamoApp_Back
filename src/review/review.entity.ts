@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Client } from '../client/client.entity';
 import { Place } from '../place/place.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Review {
+export class Review extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
