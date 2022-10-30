@@ -11,15 +11,22 @@ import { Review } from '../../review/review.entity';
 import { Mission } from '../../mission/mission.entity';
 import { MissionClient } from '../../mission-client/mission-client.entity';
 import { Post } from '../../post/post.entity';
+import { Log } from '../../log/log.entity';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const TypeOrmTestingConfig = () => [
   TypeOrmModule.forRoot({
-    type: 'sqlite',
-    database: ':memory:',
+    type: 'postgres',
+    host: process.env.DATABASE_HOST,
+    port: +process.env.DATABASE_PORT,
+    database: process.env.DATABASE_NAME + '-test',
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    entities: [__dirname + '/**/*.entity.{js,ts}'],
     dropSchema: true,
-    entities: [Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review, Mission, MissionClient, Post],
     synchronize: true,
     keepConnectionAlive: true
   }),
-  TypeOrmModule.forFeature([Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review, Mission, MissionClient, Post]),
+  TypeOrmModule.forFeature([Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review, Mission, MissionClient, Post, Log]),
 ];

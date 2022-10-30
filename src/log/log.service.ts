@@ -66,4 +66,8 @@ export class LogService {
         const filePath = path.join(logPath, fileName);
         fs.appendFileSync(filePath, log);
     }
+
+    private sendEmail(log: Log) {
+        // future feature
+    }
 }

@@ -83,7 +83,7 @@ export class PlaceService {
             }
         } else {
             let status: number;
-            const fullAddress: string = `${place.address}, ${place.neighborhood ? place.neighborhood + ', ' : ''}${place.city}, ${place.state}, ${place.country}`;
+            const fullAddress: string = `${place.address}, ${place.neighborhood ? (place.neighborhood + ', ') : ''}${place.city}, ${place.state}, ${place.country}`;
             const fetchUrl: string = 'http://api.positionstack.com/v1/forward?' + new URLSearchParams({
                 access_key: process.env.POSITIONSTACK_API_KEY,
                 query: fullAddress
@@ -123,7 +123,7 @@ export class PlaceService {
                 }
             }
 
-            place.addressLabel = response.data[i].label !== '' ? response.data[i].label : (response.data[i].name !== '' ? response.data[i].name : place.address);
+            place.addressLabel = response.data[i].label || response.data[i].name || place.address;
             place.latitude = response.data[i].latitude;
             place.longitude = response.data[i].longitude;
             place.radius = minimumRadius/response.data[i].confidence + (place.radius || 0);
