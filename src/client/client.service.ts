@@ -15,6 +15,7 @@ import { Rank } from '../rank/rank.entity';
 import { LocationClass } from '../shared/utils/location';
 import { entitiesConstants } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
+import { LogService } from '../log/log.service';
 
 @Injectable()
 export class ClientService {
@@ -35,6 +36,7 @@ export class ClientService {
         private readonly missionClientRepository: Repository<MissionClient>,
         @InjectRepository(Rank)
         private readonly rankRepository: Repository<Rank>,
+        private readonly log: LogService
     ) {}
 
     async register(client: Client): Promise<Client> {
@@ -228,7 +230,36 @@ export class ClientService {
         post.place = place;
         const newPost = await this.postRepository.save(post);
 
-        // TODO T actualizar el % de las instancias de misiones del cliente, si es el 100%, se le suma el XP al usuario y si tiene suficiente XP para subir de rango, se actualiza el rango
+        client.missions.forEach(async mission => {
+            if (mission.percentage < 1.0 && mission.mission.type === MissionType.POST) {
+                // si requiere que sea en algún lugar en específico, se verifica que sí sea el lugar, si no es, no se suma nada
+                if (mission.mission.places.length && !mission.mission.places.find(p => p.id === post.place.id))
+                    return ;
+
+                // si requiredN = 5 (se deben subir 5 posts), se suma 1/5 que es el 20% al porcentaje de la misión
+                mission.percentage += 1/mission.mission.requiredN;
+
+                if (mission.percentage > 0.99)
+                    mission.percentage = 1.0; // se aproxima
+
+                // si se cumplió la misión (100%) se le suma el XP al usuario 
+                if (mission.percentage >= 1.0) {
+                    mission.percentage = 1.0
+                    client.xp += mission.mission.prizeXp;
+                    if (client.xp >= client.rank.xpNext) {
+                        // si el XP del usuario es mayor o igual al XP necesario para subir de rango, se actualiza el rango
+                        client.xp -= client.rank.xpNext;
+                        client.rank = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
+                        if (!client.rank) {
+                            const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
+                            this.log.error(`Client ${client.id} has reached the maximum rank, or needed to create the max rank`, error, 'Publish Post');
+                            // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
+                        }
+                    }
+                }
+            }
+        });
+        await this.clientRepository.save(client);
 
         return newPost;
     }

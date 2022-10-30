@@ -1,5 +1,5 @@
 export enum MissionType {
-    PUBLISH = 'PUBLISH',
+    POST = 'POST',
     REVIEW = 'REVIEW',
     VISIT = 'VISIT'
 }
