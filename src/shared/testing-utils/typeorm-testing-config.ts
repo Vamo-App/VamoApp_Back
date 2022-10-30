@@ -20,7 +20,7 @@ export const TypeOrmTestingConfig = () => [
     type: 'postgres',
     host: process.env.DATABASE_HOST,
     port: +process.env.DATABASE_PORT,
-    database: process.env.DATABASE_NAME + '-test',
+    database: process.env.TEST_DATABASE_NAME || (process.env.DATABASE_NAME + '-test'),
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     entities: [__dirname + '/**/*.entity.{js,ts}'],

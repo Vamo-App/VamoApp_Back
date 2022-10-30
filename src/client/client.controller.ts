@@ -2,6 +2,7 @@ import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseIntercept
 import { plainToInstance } from 'class-transformer';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ClientService } from './client.service';
 import { Client } from './client.entity';
 import { Weight } from '../weight/weight.entity';
@@ -13,7 +14,6 @@ import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
 import { PostCreateDto } from '../post/dto';
 import { LocationClass } from '../shared/utils/location';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('clients')
 @UseGuards(JwtAuthGuard)
