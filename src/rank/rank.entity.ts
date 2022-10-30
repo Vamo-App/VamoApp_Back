@@ -6,9 +6,7 @@ export class Rank {
     @PrimaryColumn()
     name: string;
 
-    @Column({
-        unique: true
-    })
+    @Column() // is unique but due to query builder, must manage it manually
     level: number;
 
     @Column()

@@ -23,16 +23,7 @@ export class RankService {
         const rankFound = await this.rankRepository.findOne({ where: { name: rank.name } });
         if (rankFound)
             throw new BusinessLogicException(`Rank ${rank.name} already exists`, HttpStatus.PRECONDITION_FAILED);
-        
-        const rankLevelFound = await this.rankRepository.findOne({ where: { level: rank.level } });
-        if (rankLevelFound)
-            // move all ranks with level >= rank.level to level + 1
-            await this.rankRepository.createQueryBuilder()
-                .update(Rank)
-                .set({ level: () => 'level + 1' })
-                .where('level >= :level', { level: rank.level })
-                .execute();
-        
+
         const previousRank = await this.rankRepository.findOne({ where: { level: rank.level - 1 } });
         if (!previousRank)
             if (rank.level !== 0)
@@ -43,6 +34,16 @@ export class RankService {
                 if (rank[item])
                     throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
         }
+        
+        const rankLevelFound = await this.rankRepository.findOne({ where: { level: rank.level } });
+        if (rankLevelFound)
+            // move all ranks with level >= rank.level to level + 1
+            await this.rankRepository.createQueryBuilder()
+                .update(Rank)
+                .set({ level: () => 'level + 1' })
+                .where('level >= :level', { level: rank.level })
+                .execute();
+        
         return await this.rankRepository.save(rank);
     }
 
