@@ -12,7 +12,7 @@ import { Post as PostEntity } from '../post/post.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
 import { PostCreateDto } from '../post/dto';
-import { LocationClass } from '../shared/classes/location';
+import { LocationClass } from '../shared/utils/location';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('clients')

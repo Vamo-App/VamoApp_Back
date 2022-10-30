@@ -4,9 +4,11 @@ import { BusinessErrorsInterceptor } from '../shared/interceptors/business-error
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
 import { PlaceService } from './place.service';
 import { Place } from './place.entity';
+import { Business } from '../business/business.entity';
 import { Tag } from '../tag/tag.entity';
 import { Review } from '../review/review.entity';
 import { Post as PostEntity } from '../post/post.entity';
+import { Event } from '../event/event.entity';
 import { Media } from '../media/media.entity';
 import { PlaceProspectCreateDto, PlaceCreateDto, PlaceUpdateDto } from './dto';
 import { ReviewCreateDto, ReviewUpdateDto } from '../review/dto';
@@ -51,24 +53,34 @@ export class PlaceController {
 
     @Post('admin')
     async create(@Body() placeDto: PlaceCreateDto): Promise<Place> {
-        const { tags } = placeDto;
+        const { tags, businessId } = placeDto;
         const place = plainToInstance(Place, placeDto);
         place.tags = tags.map(tag => {
             const t = new Tag();
             t.tag = tag;
             return t;
-        });        place.prospect = false;
+        });
+        place.prospect = false;
+        if (businessId) {
+            place.business = new Business();
+            place.business.id = businessId;
+        }
         return await this.service.create(place);
     }
 
     @Put(':placeId')
     async update(@Param('placeId') placeId: string, @Body() placeDto: PlaceUpdateDto): Promise<Place> {
+        const { businessId } = placeDto;
         const place = plainToInstance(Place, placeDto);
+        if (businessId) {
+            place.business = new Business();
+            place.business.id = businessId;
+        }
         return await this.service.update(placeId, place);
     }
 
     @Delete(':placeId')
-    async delete(@Param('placeId') placeId: string): Promise<Place> {
+    async delete(@Param('placeId') placeId: string): Promise<void> {
         return await this.service.delete(placeId);
     }
 

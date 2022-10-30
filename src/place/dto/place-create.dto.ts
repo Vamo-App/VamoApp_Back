@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsNotEmpty, IsString, IsUrl, ArrayNotEmpty, IsNumber } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsUrl, ArrayNotEmpty, IsNumber, IsEnum } from 'class-validator';
+import { Country } from '../../shared/enums/country.enum';
 
 export class PlaceCreateDto {
     @IsString()
@@ -10,7 +11,7 @@ export class PlaceCreateDto {
     @IsOptional()
     readonly picture: string;
 
-    @IsString()
+    @IsEnum(Country)
     @IsNotEmpty()
     readonly country: string;
 
@@ -37,6 +38,10 @@ export class PlaceCreateDto {
     @IsNumber()
     @IsOptional()
     readonly longitude: number;
+
+    @IsNumber()
+    @IsOptional()
+    readonly radius: number;
 
     @IsString()
     @IsOptional()

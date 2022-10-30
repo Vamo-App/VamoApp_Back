@@ -12,7 +12,7 @@ import { Place } from '../place/place.entity';
 import { Review } from '../review/review.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Rank } from '../rank/rank.entity';
-import { LocationClass } from '../shared/classes/location';
+import { LocationClass } from '../shared/utils/location';
 import { entitiesConstants } from '../shared/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 
@@ -31,8 +31,6 @@ export class ClientService {
         private readonly missionRepository: Repository<Mission>,
         @InjectRepository(Place)
         private readonly placeRepository: Repository<Place>,
-        @InjectRepository(Review)
-        private readonly reviewRepository: Repository<Review>,
         @InjectRepository(MissionClient)
         private readonly missionClientRepository: Repository<MissionClient>,
         @InjectRepository(Rank)
@@ -82,7 +80,7 @@ export class ClientService {
     }
 
     async getAll(q: string): Promise<Client[]> {
-        let clients = await this.clientRepository.find({ relations: ['rank', 'weights'] });
+        let clients = await this.clientRepository.find({ relations: ['rank'] });
         if (q)
             clients = clients.filter(client => client.name.toLowerCase().includes(q.toLowerCase()));
         if (!clients.length)
@@ -261,7 +259,7 @@ export class ClientService {
     }
 
     async reportLocationToAccomplishMissions(clientId: string, location:LocationClass): Promise<MissionClient[]> {
-        //TODO O
+        //TODO B
         return ;
     }
 }

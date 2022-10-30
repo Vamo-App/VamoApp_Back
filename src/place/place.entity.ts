@@ -7,6 +7,7 @@ import { Tag } from '../tag/tag.entity';
 import { Mission } from '../mission/mission.entity';
 import { Media } from '../media/media.entity';
 import { Event } from '../event/event.entity';
+import { Country } from '../shared/enums/country.enum';
 
 @Entity()
 export class Place {
@@ -22,7 +23,7 @@ export class Place {
     picture: string;
 
     @Column()
-    country: string;
+    country: Country;
 
     @Column()
     state: string;
@@ -38,6 +39,9 @@ export class Place {
     @Column()
     address: string;
     
+    @Column()
+    addressLabel: string;
+
     @Column({ 
         type: "float"
     })
@@ -47,6 +51,11 @@ export class Place {
         type: "float"
     })
     longitude: number;
+
+    @Column({
+        type: "float"
+    })
+    radius: number;
 
     @Column({
         nullable: true
@@ -59,7 +68,8 @@ export class Place {
     website: string;
 
     @Column({ 
-        type: "float"
+        type: "float",
+        default: 0
     })
     average: number;
 
