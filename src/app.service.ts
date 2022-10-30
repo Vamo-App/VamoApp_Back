@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Client } from './client/client.entity';
 import { Place } from './place/place.entity';
 import { Weight } from './weight/weight.entity';
+=======
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+//import { ConfigService } from '@nestjs/config';
+import { Client } from './client/client.entity';
+import { Place } from './place/place.entity';
+>>>>>>> 737b08a (archivo debug, y planteamiento del app.controller.ts)
 
 @Injectable()
 export class AppService {
@@ -11,14 +20,19 @@ export class AppService {
   //public config;
   constructor (
     @InjectRepository(Client)
+<<<<<<< HEAD
     private readonly clientRepository: Repository<Client>,
     @InjectRepository(Place)
     private readonly placeRepository: Repository<Place>
+=======
+    private readonly clientRepository: Repository<Client>
+>>>>>>> 737b08a (archivo debug, y planteamiento del app.controller.ts)
   ) {}
 
   async vamo(clientIds: string[], longitude: number, latitude: number, radius: number ): Promise<Place[]> {
     let client: Client[] = [];
     let place: Place[] = [];
+<<<<<<< HEAD
     for (let i = 0; i < clientIds.length; i++) {
       client.push(await this.clientRepository.findOne({where: {id: clientIds[i]}})); 
     }
@@ -30,6 +44,12 @@ export class AppService {
       }
     }
 
+=======
+    //make a for in 
+    for (let i = 0; i < clientIds.length; i++) {
+      client.push(await this.clientRepository.findOne({where: {id: clientIds[i]}})); 
+    }
+>>>>>>> 737b08a (archivo debug, y planteamiento del app.controller.ts)
 
     return place; 
   }
