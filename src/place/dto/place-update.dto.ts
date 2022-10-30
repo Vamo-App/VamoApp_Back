@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsUrl, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsUrl, IsEnum, Min } from 'class-validator';
 import { Country } from '../../shared/enums/country.enum';
 
 export class PlaceUpdateDto {
@@ -39,6 +39,7 @@ export class PlaceUpdateDto {
     readonly longitude: number;
 
     @IsNumber()
+    @Min(0)
     @IsOptional()
     readonly radius: number;
 

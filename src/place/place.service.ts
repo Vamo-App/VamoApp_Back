@@ -74,8 +74,13 @@ export class PlaceService {
 
         // IMPORTANTE: Si NO se envían como parámetro 'longitude' y 'latitude', se hace la solicitud a una API externa LIMITADA. Si se conocen estos dos datos, es mejor enviarlos como parámetro
         if (place.longitude || place.latitude) {
-            if (!place.longitude || !place.latitude)
+            if (!place.longitude || !place.latitude) {
                 throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.PRECONDITION_FAILED);
+            }
+            else {
+                place.addressLabel = place.address;
+                place.radius = minimumRadius + (place.radius || 0);
+            }
         } else {
             let status: number;
             const fullAddress: string = `${place.address}, ${place.neighborhood ? place.neighborhood + ', ' : ''}${place.city}, ${place.state}, ${place.country}`;
@@ -84,7 +89,6 @@ export class PlaceService {
                 query: fullAddress
             });
             this.log.info(`PositionStack API consumed at endpoint: \n'${fetchUrl}'`, 'Create Place');
-            return ; // DELETE this
             const response: any = await fetch(`${fetchUrl}`)
                     .then(res => {
                         status = res.status;
@@ -122,7 +126,7 @@ export class PlaceService {
             place.addressLabel = response.data[i].label !== '' ? response.data[i].label : (response.data[i].name !== '' ? response.data[i].name : place.address);
             place.latitude = response.data[i].latitude;
             place.longitude = response.data[i].longitude;
-            place.radius = minimumRadius/response.data[i].confidence + (place.radius ? place.radius : 0);
+            place.radius = minimumRadius/response.data[i].confidence + (place.radius || 0);
         }
 
         // el negocio a asociar debe existir

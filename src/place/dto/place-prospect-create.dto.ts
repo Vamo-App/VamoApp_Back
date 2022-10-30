@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsNotEmpty, IsString, IsNumber, IsUrl, ArrayNotEmpty, IsEnum } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsNumber, IsUrl, ArrayNotEmpty, IsEnum, Min } from 'class-validator';
 import { Country } from '../../shared/enums/country.enum';
 
 export class PlaceProspectCreateDto {
@@ -32,6 +32,7 @@ export class PlaceProspectCreateDto {
     readonly address: string;
 
     @IsNumber()
+    @Min(0)
     @IsOptional()
     readonly radius: number;
 
