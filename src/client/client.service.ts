@@ -228,7 +228,7 @@ export class ClientService {
     }
 
     async getPosts(clientId: string): Promise<Post[]> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
+        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         if (!client.posts.length)
@@ -237,7 +237,7 @@ export class ClientService {
     }
 
      async publishPost(clientId: string, post:Post): Promise<Post> {
-        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts', 'missions', 'weights', 'rank'] });
+        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['weights', 'rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         const place = await this.placeRepository.findOne({ where: {id: post.place.id} });
@@ -250,8 +250,13 @@ export class ClientService {
         client.missions.forEach(async mission => {
             if (mission.percentage < 1.0 && mission.mission.type === MissionType.POST) {
                 // si requiere que sea en algún lugar en específico, se verifica que sí sea el lugar, si no es, no se suma nada
-                if (mission.mission.places.length && !mission.mission.places.find(p => p.id === post.place.id))
+                if (mission.mission.places.length && !mission.mission.places.find(p => p.id === post.place.id)) {
                     return ;
+                }
+
+                if (mission.mission.tag && !post.place.tags.find(t => t.tag === mission.mission.tag.tag)) {
+                    return ;
+                }
 
                 // si requiredN = 5 (se deben subir 5 posts), se suma 1/5 que es el 20% al porcentaje de la misión
                 mission.percentage += 1/mission.mission.requiredN;
@@ -266,18 +271,23 @@ export class ClientService {
                     if (client.xp >= client.rank.xpNext) {
                         // si el XP del usuario es mayor o igual al XP necesario para subir de rango, se actualiza el rango
                         client.xp -= client.rank.xpNext;
-                        client.rank = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
-                        if (!client.rank) {
+                        const rankFound = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
+                        if (!rankFound) {
                             const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
-                            this.log.error(`Client ${client.id} has reached the maximum rank, or needed to create the max rank`, error, 'Publish Post');
+                            this.log.error(`Client ${client.id} has reached the maximum current rank, or it's needed to create a next rank`, error, 'Publish Post');
                             // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
+                        }
+                        else {
+                            client.rank = rankFound;
                         }
                     }
                 }
+                await this.missionClientRepository.save(mission);
             }
         });
-        await this.clientRepository.save(client);
+        const clientUpdated = await this.clientRepository.save(client); // actualizar cliente
 
+        newPost.client = clientUpdated;
         return newPost;
     }
 
@@ -297,13 +307,22 @@ export class ClientService {
         return post;
     }
 
-    async getMissions(clientId: string): Promise<MissionClient[]> {
+    async getMissions(clientId: string): Promise<any[]> {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['missions'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         if (!client.missions.length)
             throw new BusinessLogicException(`The client with the id (${clientId}) has no missions`, HttpStatus.NO_CONTENT);
-        return client.missions;
+        
+        const missions: any = { 'complete': [], 'incomplete': [] };
+        client.missions.forEach(mission => {
+            if (mission.percentage >= 1.0)
+                missions.complete.push(mission);
+            else
+                missions.incomplete.push(mission);
+        });
+
+        return missions;
     }
 
     async reportLocationToAccomplishMissions(clientId: string, location:LocationClass): Promise<MissionClient[]> {

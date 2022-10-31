@@ -115,7 +115,7 @@ export class ClientController {
     }
 
     @Get(':clientId/missions')
-    async getMissions(@Param('clientId') clientId: string): Promise<MissionClient[]> {
+    async getMissions(@Param('clientId') clientId: string): Promise<any[]> {
         return await this.service.getMissions(clientId);
     }
 

@@ -81,6 +81,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId')
+    @HttpCode(204)
     async delete(@Param('placeId') placeId: string): Promise<void> {
         return await this.service.delete(placeId);
     }
@@ -91,6 +92,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId/tags/:tag')
+    @HttpCode(204)
     async removeTag(@Param('placeId') placeId: string, @Param('tag') tag: string): Promise<Place> {
         return await this.service.removeTag(placeId, tag);
     }
@@ -101,6 +103,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId/business/:businessId')
+    @HttpCode(204)
     async dissociateBusiness(@Param('placeId') placeId: string, @Param('businessId') businessId: string): Promise<Place> {
         return await this.service.dissociateBusiness(placeId, businessId);
     }
@@ -128,6 +131,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId/reviews/:reviewId')
+    @HttpCode(204)
     async deleteReview(@Param('placeId') placeId: string, @Param('reviewId') reviewId: string): Promise<Review> {
         return await this.service.deleteReview(placeId, reviewId);
     }
@@ -150,6 +154,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId/events/:eventId')
+    @HttpCode(204)
     async deleteEvent(@Param('placeId') placeId: string, @Param('eventId') eventId: string): Promise<Event> {
         return await this.service.deleteEvent(placeId, eventId);
     }
@@ -166,6 +171,7 @@ export class PlaceController {
     }
 
     @Delete(':placeId/media/:mediaId')
+    @HttpCode(204)
     async deleteMedia(@Param('placeId') placeId: string, @Param('mediaId') mediaId: string): Promise<Media> {
         return await this.service.deleteMedia(placeId, mediaId);
     }

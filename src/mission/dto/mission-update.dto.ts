@@ -20,4 +20,11 @@ export class MissionUpdateDto {
     @IsBoolean()
     @IsOptional()
     readonly base: boolean;
+
+    @IsString()
+    @IsOptional()
+    readonly _tag: string;
+
+    @IsOptional()
+    readonly _places: string[];
 }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsEnum, IsBoolean } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsNumber, IsEnum, IsBoolean } from 'class-validator';
 import { MissionType } from '../../shared/enums/mission-type.enum';
 
 export class MissionCreateDto {
@@ -25,4 +25,11 @@ export class MissionCreateDto {
     @IsBoolean()
     @IsNotEmpty()
     readonly base: boolean;
+
+    @IsString()
+    @IsOptional()
+    readonly _tag: string;
+
+    @IsOptional()
+    readonly _places: string[];
 }
