@@ -36,6 +36,7 @@ import { LogModule } from './log/log.module';
     MediaModule,
     VamoUserModule,
     AuthModule,
+    LogModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -50,7 +51,6 @@ import { LogModule } from './log/log.module';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
-    LogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

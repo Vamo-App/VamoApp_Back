@@ -42,8 +42,9 @@ export class PlaceController {
     }
 
     @Get()
-    async getAll(@Query('q') q:string): Promise<Place[]> {
-        return await this.service.getAll(q);
+    async getAll(@Query('q') q: string, @Query('clientId') clientId: string, @Query('eachWord') eachWord: boolean): Promise<Place[]> {
+        console.log(eachWord);
+        return await this.service.getAll(q, clientId, eachWord);
     }
 
     @Get(':placeId')

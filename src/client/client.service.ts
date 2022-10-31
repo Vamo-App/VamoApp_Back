@@ -16,6 +16,7 @@ import { LocationClass } from '../shared/utils/location';
 import { entitiesConstants } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { LogService } from '../log/log.service';
+import { planeText } from '../shared/utils/functions';
 
 @Injectable()
 export class ClientService {
@@ -44,12 +45,13 @@ export class ClientService {
         if (clientFound)
             throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
+        /* // ya lo verifica el pipe con whitelist
         for (const item in client) {
             if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1) {
                 if (client[item])
                     throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
             }
-        }
+        }*/
 
         // settear el rango 0 por defecto, si no existe, crearlo
         let rank = await this.rankRepository.findOne({ where: { level:0 } });
@@ -81,10 +83,24 @@ export class ClientService {
         return await this.clientRepository.save(client);
     }
 
-    async getAll(q: string): Promise<Client[]> {
+    async getAll(q: string, eachWord: boolean): Promise<Client[]> {
         let clients = await this.clientRepository.find({ relations: ['rank'] });
-        if (q)
-            clients = clients.filter(client => client.name.toLowerCase().includes(q.toLowerCase()));
+
+        if (q) {
+            const qL: string[] = eachWord ? planeText(q).split(' ') : [planeText(q)];
+
+            let i: number = 0;
+            while (i < clients.length) {
+                // busca si el nombre contiene la palabra buscada
+                const clientName = planeText(clients[i].name);
+
+                if (qL.some(v => clientName.includes(v)))
+                    i++;
+                else
+                    clients.splice(i, 1);
+            }
+        }
+
         if (!clients.length)
             throw new BusinessLogicException(`No clients were found`, HttpStatus.NO_CONTENT);
         return clients;
@@ -108,11 +124,12 @@ export class ClientService {
                 throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
         }
 
+        /* // ya lo verifica el pipe con whitelist
         for (const item in client) {
             if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1)
                 if (client[item])
                     throw new BusinessLogicException(`The field ${item} cannot be manually modified`, HttpStatus.FORBIDDEN);
-        }
+        }*/
         return await this.clientRepository.save({...clientToUpdate, ...client});
     }
 

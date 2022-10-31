@@ -36,8 +36,8 @@ export class ClientController {
     }
 
     @Get()
-    async getAll(@Query('q') q:string): Promise<Client[]> {
-        return await this.service.getAll(q);
+    async getAll(@Query('q') q: string, @Query('eachWord') eachWord: boolean): Promise<Client[]> {
+        return await this.service.getAll(q, eachWord);
     }
 
     @Get(':clientId')

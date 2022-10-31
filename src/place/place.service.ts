@@ -14,6 +14,7 @@ import { Media } from '../media/media.entity';
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { minimumRadius } from '../shared/utils/constants';
 import { LogService } from '../log/log.service';
+import { planeText } from '../shared/utils/functions';
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
   import('node-fetch').then(({ default: fetch }) => fetch(url, init));
@@ -48,10 +49,40 @@ export class PlaceService {
         return ;
     }
 
-    async getAll(q: string): Promise<Place[]> {
+    async getAll(q: string, clientId: string, eachWord: boolean): Promise<Place[]> {
         let places = await this.placeRepository.find({ relations: ['tags', 'business'] });
-        if (q) 
-            places = places.filter(place => place.name.toLowerCase().includes(q.toLowerCase()));
+
+        if (q) {
+            // cambios en el query para que quede lo mejor posible
+            const qL: string[] = eachWord ? planeText(q).split(' ') : [planeText(q)];
+
+            let i: number = 0;
+            while (i < places.length) {
+                let j: number = 0;
+                // busca si alguno de los tags del lugar contiene la palabra buscada
+                while (j < places[i].tags.length) {
+                    const tag = planeText(places[i].tags[j].tag);
+                    if (qL.some((v: string) => tag.includes(v))) {
+                        break;
+                    } else {
+                        j++;
+                    }
+                }
+                if (j === places[i].tags.length) {
+                    const placeName = planeText(places[i].name);
+                    const businessName = places[i].business ? planeText(places[i].business.name) : '';
+                    // busca si el nombre del lugar o del negocio contiene la palabra buscada
+                    if (qL.some(v => placeName.includes(v)) || qL.some(v => businessName.includes(v))) {
+                        i++;
+                    } else {
+                        places.splice(i, 1);
+                    }
+                } else {
+                    i++;
+                }
+            }
+        }
+
         if (!places.length)
             throw new BusinessLogicException(`No places were found`, HttpStatus.NO_CONTENT);
         return places;
@@ -65,11 +96,27 @@ export class PlaceService {
     }
 
     async create(place: Place): Promise<Place> {
+        /* // ya lo verifica el pipe con whitelist
         for (const item in place) {
             if (['id', 'average', 'clientsPending', 'clientsLiked', 'reviews', 'posts', 'business', 'placeMissions', 'medias', 'events'].findIndex(x => x === item) !== -1) {
                 if (place[item])
                     throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
             }
+        }*/
+
+        // el negocio a asociar debe existir
+        if (place.business) {
+            const business = await this.businessRepository.findOne({ where: {id: place.business.id} });
+            if (!business)
+                throw new BusinessLogicException(`Business with id ${place.business.id} was not found`, HttpStatus.NOT_FOUND);
+            place.business = business;
+        }
+
+        // si hay algun tag del lugar que no existe, se crea
+        for (const tag of place.tags) {
+            const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
+            if (!tagFound)
+                await this.tagRepository.save(tag);
         }
 
         // IMPORTANTE: Si NO se envían como parámetro 'longitude' y 'latitude', se hace la solicitud a una API externa LIMITADA. Si se conocen estos dos datos, es mejor enviarlos como parámetro
@@ -96,12 +143,12 @@ export class PlaceService {
                     });
             if (status !== 200) {
                 this.log.error(`Error status ${status} when calling PositionStack API`, JSON.stringify(response), 'Create Place');
-                throw new BusinessLogicException(`Error in the request to the external API`, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new BusinessLogicException(`Error in the request`, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             if (!response || !response.data || !response.data[0] || !response.data[0].latitude || !response.data[0].longitude) {
                 this.log.warn(`The address '${fullAddress}' was not found by PositionStack API`, JSON.stringify(response), 'Create Place');
-                throw new BusinessLogicException(`The address '${fullAddress}' was not found by the API`, HttpStatus.NOT_FOUND);
+                throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
             }
             
             let i: number = 0;
@@ -116,7 +163,7 @@ export class PlaceService {
 
                 if (i === -1) {
                     this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but any was found in the country`, JSON.stringify(response), 'Create Place');
-                    throw new BusinessLogicException(`The address '${fullAddress}' was not found in the country '${place.country}' by the API`, HttpStatus.NOT_FOUND);
+                    throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
                 } else {
                     this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but at least one found in the country`, JSON.stringify(response), 'Create Place');
                     console.log(`WARNING: The address '${fullAddress}' was found more than once by the API, but it was found in the country '${place.country}'`);
@@ -127,21 +174,6 @@ export class PlaceService {
             place.latitude = response.data[i].latitude;
             place.longitude = response.data[i].longitude;
             place.radius = minimumRadius/response.data[i].confidence + (place.radius || 0);
-        }
-
-        // el negocio a asociar debe existir
-        if (place.business) {
-            const business = await this.businessRepository.findOne({ where: {id: place.business.id} });
-            if (!business)
-                throw new BusinessLogicException(`Business with id ${place.business.id} was not found`, HttpStatus.NOT_FOUND);
-            place.business = business;
-        }
-
-        // si hay algun tag del lugar que no existe, se crea
-        for (const tag of place.tags) {
-            const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
-            if (!tagFound)
-                await this.tagRepository.save(tag);
         }
 
         return this.placeRepository.save(place);

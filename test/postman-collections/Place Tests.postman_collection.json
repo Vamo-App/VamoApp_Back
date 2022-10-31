@@ -208,7 +208,7 @@
 			"response": []
 		},
 		{
-			"name": "Get all places by keyword",
+			"name": "Get all places by keyword (name)",
 			"event": [
 				{
 					"listen": "test",
@@ -248,7 +248,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places?q=da",
+					"raw": "{{baseUrl}}/places?q=Theat",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -258,7 +258,127 @@
 					"query": [
 						{
 							"key": "q",
-							"value": "da"
+							"value": "Theat"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all places by keyword (tag)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places?q=disc",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "disc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all places by keyword (name with other things)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places?q=++tHÉa+++++5+++&eachWord=true",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "++tHÉa+++++5+++"
+						},
+						{
+							"key": "eachWord",
+							"value": "true"
 						}
 					]
 				}
@@ -306,7 +426,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places?q=aaaaaaaaaa",
+					"raw": "{{baseUrl}}/places?q=hall",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -316,7 +436,7 @@
 					"query": [
 						{
 							"key": "q",
-							"value": "aaaaaaaaaa"
+							"value": "hall"
 						}
 					]
 				}
