@@ -35,7 +35,21 @@ export class DataSetup1544692010000 implements MigrationInterface {
         INSERT INTO public.rank (name, level, xpNext) VALUES ('Terrestrial', 25, 67108864000);
         INSERT INTO public.rank (name, level, xpNext) VALUES ('Astral', 26, 134217728000);
         INSERT INTO public.rank (name, level, xpNext) VALUES ('Celestial', 27, 268435456000);
-        INSERT INTO public.rank (name, level, xpNext) VALUES ('Aetherial', 28, 536870912000);*/
+        INSERT INTO public.rank (name, level, xpNext) VALUES ('Aetherial', 28, 536870912000);
+        
+        -- Inserting Base Missions
+
+        -- Inserting Vamo Business Account
+
+        -- Inserting Default Tags
+
+        -- Inserting First Places
+
+        -- Inserting Media for first Places
+
+        -- Inserting Events for first Places
+        
+        */
     `
 
     public async up(queryRunner: QueryRunner): Promise<any> {

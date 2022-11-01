@@ -7,9 +7,13 @@ import { Post } from '../post/post.entity';
 import { Weight } from '../weight/weight.entity';
 import { Tag } from '../tag/tag.entity';
 import { Mission } from '../mission/mission.entity';
+import { Place } from '../place/place.entity';
+import { MissionClient } from '../mission-client/mission-client.entity';
+import { Rank } from '../rank/rank.entity';
+import { LogModule } from '../log/log.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Client, Post, Weight, Tag, Mission])],
+  imports: [TypeOrmModule.forFeature([Client, Post, Weight, Tag, Mission, Place, MissionClient, Rank]), LogModule],
   providers: [ClientService],
   controllers: [ClientController]
 })

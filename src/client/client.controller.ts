@@ -1,7 +1,8 @@
-import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Body, Param, HttpCode, Get, Post, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BusinessErrorsInterceptor } from '../shared/interceptors/business-errors.interceptor';
 import { TransformInterceptor } from '../shared/interceptors/transform.interceptor';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ClientService } from './client.service';
 import { Client } from './client.entity';
 import { Weight } from '../weight/weight.entity';
@@ -12,10 +13,10 @@ import { Post as PostEntity } from '../post/post.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
 import { PostCreateDto } from '../post/dto';
-import { LocationClass } from '../shared/classes/location';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { LocationDto } from '../shared/utils/location';
 
 @Controller('clients')
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(BusinessErrorsInterceptor, TransformInterceptor)
 export class ClientController {
     constructor(private readonly service: ClientService) {}
@@ -34,15 +35,9 @@ export class ClientController {
         return await this.service.register(client);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get()
-    async getAll(): Promise<Client[]> {
-        return await this.service.getAll();
-    }
-
-    @Get('?q=:q')
-    async getAllFiltered(@Param('q') q: string): Promise<Client[]> {
-        return await this.service.getAllFiltered(q);
+    async getAll(@Query('q') q: string, @Query('eachWord') eachWord: boolean): Promise<Client[]> {
+        return await this.service.getAll(q, eachWord);
     }
 
     @Get(':clientId')
@@ -89,8 +84,8 @@ export class ClientController {
     }
 
     @Post(':clientId/liked/:placeId')
-    async addLiked(@Param('clientId') clientId: string): Promise<Place> {
-        return await this.service.addLiked(clientId);
+    async addLiked(@Param('clientId') clientId: string, @Param('placeId') placeId: string): Promise<Place> {
+        return await this.service.addLiked(clientId, placeId);
     }
 
     @Delete(':clientId/liked/:placeId')
@@ -106,22 +101,28 @@ export class ClientController {
 
     @Post(':clientId/posts')
     async publishPost(@Param('clientId') clientId: string, @Body() postCreateDto: PostCreateDto): Promise<PostEntity> {
+        const place: Place = new Place();
+        place.id = postCreateDto.placeId;
         const post: PostEntity = plainToInstance(PostEntity, postCreateDto);
+        post.place = place;
         return await this.service.publishPost(clientId, post);
     }
 
     @Delete(':clientId/posts/:postId')
+    @HttpCode(204)
     async removePost(@Param('clientId') clientId: string, @Param('postId') postId: string): Promise<PostEntity> {
         return await this.service.removePost(clientId, postId);
     }
 
     @Get(':clientId/missions')
-    async getMissions(@Param('clientId') clientId: string): Promise<MissionClient[]> {
+    async getMissions(@Param('clientId') clientId: string): Promise<any[]> {
         return await this.service.getMissions(clientId);
     }
 
     @Post(':clientId/missions/report')
-    async reportLocationToAccomplishMissions(@Param('clientId') clientId: string, @Body() location:LocationClass): Promise<MissionClient[]> {
+    async reportLocationToAccomplishMissions(@Param('clientId') clientId: string, @Body() location:LocationDto): Promise<MissionClient[]> {
         return await this.service.reportLocationToAccomplishMissions(clientId, location);
     }
+
+    // TODO T todos funcionan bien (ya lo comprobé por PSQL), pero hacen falta los test de postman desde 'getReviews' (no se pueden probar aun)
 }

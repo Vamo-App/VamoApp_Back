@@ -18,6 +18,7 @@ import { MediaModule } from './media/media.module';
 import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
 import { Client } from './client/client.entity';
+import { LogModule } from './log/log.module';
 
 @Module({
   imports: [
@@ -28,11 +29,15 @@ import { Client } from './client/client.entity';
     RankModule, 
     MissionClientModule, 
     MissionModule, 
-    BusinessModule, PostModule, 
+    BusinessModule, 
+    PostModule, 
     PlaceModule, 
     ReviewModule, 
     EventModule, 
     MediaModule,
+    VamoUserModule,
+    AuthModule,
+    LogModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -47,9 +52,6 @@ import { Client } from './client/client.entity';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
-    TypeOrmModule.forFeature([Client]),
-    VamoUserModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService ],

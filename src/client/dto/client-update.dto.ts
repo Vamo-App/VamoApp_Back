@@ -1,23 +1,27 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsString, IsEmail, IsUrl, MinLength, Matches } from 'class-validator';
 
 export class ClientUpdateDto {
-    @IsString()
-    @IsNotEmpty()
+    @IsEmail()
+    @IsOptional()
+    @Transform(({value}) => value.toLowerCase())
     readonly email: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly name: string;
 
     @IsString()
-    @IsNotEmpty()
+    @MinLength(8)
+    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak, must contain at least one uppercase letter, one lowercase letter, one number or special character'})
+    @IsOptional()
     readonly password: string;
 
     @IsUrl()
-    @IsNotEmpty()
+    @IsOptional()
     readonly picture: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly description: string;
 }

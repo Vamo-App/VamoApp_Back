@@ -1,12 +1,13 @@
 import { Entity, PrimaryColumn, OneToMany, Column } from 'typeorm';
 import { Client } from '../client/client.entity';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Rank {
+export class Rank extends BaseEntity {
     @PrimaryColumn()
     name: string;
 
-    @Column()
+    @Column() // is unique but due to query builder, must manage it manually
     level: number;
 
     @Column()

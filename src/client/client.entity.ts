@@ -6,9 +6,10 @@ import { Post } from '../post/post.entity';
 import { Review } from '../review/review.entity';
 import { Place} from '../place/place.entity';
 import { Exclude } from 'class-transformer';
+import { BaseEntity } from '../shared/utils/base';
 
 @Entity()
-export class Client {
+export class Client extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -20,14 +21,20 @@ export class Client {
     @Column()
     name: string;
 
-    @Exclude({ toPlainOnly: true })
+    @Exclude({ 
+        toPlainOnly: true 
+    })
     @Column()
     password: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     picture: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     description: string;
 
     @Column({
@@ -47,7 +54,7 @@ export class Client {
     @OneToMany(type => Post, post => post.client)
     posts: Post[];
 
-    @ManyToOne(type => Review, review => review.client)
+    @OneToMany(type => Review, review => review.client)
     reviews: Review[];
 
     @ManyToMany(type => Place, place => place.clientsPending)

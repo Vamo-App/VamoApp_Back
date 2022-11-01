@@ -1,4 +1,11 @@
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class RankUpdateDto {
-    //TODO O
+    @IsString()
+    @IsOptional()
+    readonly name: string;
+
+    @IsNumber()
+    @IsOptional()
+    readonly xpNext: number;
 }
