@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { Mission } from './mission.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Client } from '../client/client.entity';
+import { MissionType } from '../shared/enums/mission-type.enum';
+import { Place } from '../place/place.entity';
 
 @Injectable()
 export class MissionService {
@@ -16,6 +18,8 @@ export class MissionService {
         private readonly missionClientRepository: Repository<MissionClient>,
         @InjectRepository(Client)
         private readonly clientRepository: Repository<Client>,
+        @InjectRepository(Place)
+        private readonly placeRepository: Repository<Place>
     ) {}
 
     async getAll(): Promise<Mission[]> {
@@ -24,6 +28,23 @@ export class MissionService {
 
     async create(mission: Mission): Promise<Mission> {
         const clients: Client[] = await this.clientRepository.find();
+
+        if (mission.places && mission.places.length && mission.tag)
+            throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.BAD_REQUEST);
+
+        if (mission.places) {
+            const realPlaces: Place[] = [];
+            for (const place of mission.places) {
+                const realPlace = await this.placeRepository.findOne({ where: {id:place.id} });
+                if (!realPlace)
+                    throw new BusinessLogicException(`The place with id (${place.id}) was not found`, HttpStatus.NOT_FOUND);
+                realPlaces.push(realPlace);
+            }
+            mission.places = realPlaces;
+        }
+
+        if (mission.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.BAD_REQUEST);
 
         const missionCreated = await this.repository.save(mission);
 

@@ -12,11 +12,11 @@ import { Place } from '../place/place.entity';
 import { Review } from '../review/review.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Rank } from '../rank/rank.entity';
-import { LocationClass } from '../shared/utils/location';
+import { LocationDto } from '../shared/utils/location';
 import { entitiesConstants } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { LogService } from '../log/log.service';
-import { planeText } from '../shared/utils/functions';
+import { planeText, distance } from '../shared/utils/functions';
 
 @Injectable()
 export class ClientService {
@@ -282,6 +282,7 @@ export class ClientService {
                         }
                     }
                 }
+
                 await this.missionClientRepository.save(mission);
             }
         });
@@ -325,8 +326,73 @@ export class ClientService {
         return missions;
     }
 
-    async reportLocationToAccomplishMissions(clientId: string, location:LocationClass): Promise<MissionClient[]> {
-        //TODO B
-        return ;
+    async reportLocationToAccomplishMissions(clientId: string, location:LocationDto): Promise<MissionClient[]> {
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
+        
+        // encuentra todos los lugares que se encuentran en el radio de la locación dada
+        const allPlaces = await this.placeRepository.find();
+        const places = allPlaces.filter(place => {
+            const dist = distance(location.latitude, location.longitude, place.latitude, place.longitude);
+            console.log("distance", dist);
+            return dist <= place.radius;
+        });
+
+        // si no hay lugares en el radio, no se hace nada
+        if (!places.length)
+            throw new BusinessLogicException(`There are no places near to the given location`, HttpStatus.NO_CONTENT);
+        
+        const missionsAccomplished = [];
+        client.missions.forEach(async mission => {
+            if (mission.percentage < 1.0 && mission.mission.type === MissionType.VISIT) {
+                // si requiere que sea en algún lugar en específico, se verifica que sí sea el lugar, si no es, no se suma nada
+                // o si se requiere que el lugar tenga algún tag en específico, se verifica que sí lo tenga, si no es, no se suma nada
+                if (!(mission.mission.places && mission.mission.places.length) && !mission.mission.tag) {
+                    this.log.warn(`The visit mission with the id (${mission.mission.id}) has no places or tag`, JSON.stringify(mission.mission), 'Report Location To Accomplish Missions');
+                    return ;
+                }
+
+                if (mission.mission.places.length && !mission.mission.places.find(p => places.find(place => place.id === p.id))) {
+                    return ;
+                }
+
+                if (mission.mission.tag && !places.find(place => place.tags.find(t => t.tag === mission.mission.tag.tag))) {
+                    return ;
+                }
+
+                // EJ: si requiredN = 5 (se deben visitar 5 lugares), se suma 1/5 que es el 20% al porcentaje de la misión
+                mission.percentage += 1/mission.mission.requiredN;
+
+                if (mission.percentage > 0.99)
+                    mission.percentage = 1.0; // se aproxima
+
+                // si se cumplió la misión (100%) se le suma el XP al usuario 
+                if (mission.percentage >= 1.0) {
+                    mission.percentage = 1.0
+                    client.xp += mission.mission.prizeXp;
+                    if (client.xp >= client.rank.xpNext) {
+                        // si el XP del usuario es mayor o igual al XP necesario para subir de rango, se actualiza el rango
+                        client.xp -= client.rank.xpNext;
+                        const rankFound = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
+                        if (!rankFound) {
+                            const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
+                            this.log.error(`Client ${client.id} has reached the maximum current rank, or it's needed to create a next rank`, error, 'Report Location');
+                            // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
+                        }
+                        else {
+                            client.rank = rankFound;
+                        }
+                    }
+                }
+
+                await this.missionClientRepository.save(mission);
+                missionsAccomplished.push(mission);
+            }
+        });
+        await this.clientRepository.save(client); // actualizar cliente
+
+        if (!missionsAccomplished.length)
+            throw new BusinessLogicException(`There are no missions accomplished`, HttpStatus.NO_CONTENT);
+
+        return missionsAccomplished;
     }
 }

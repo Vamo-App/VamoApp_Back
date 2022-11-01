@@ -41,17 +41,19 @@ export class Log {
 
     toString(): string {
         const date = new Date();
+        const offset = date.getTimezoneOffset();
+        date.setMinutes(date.getMinutes() - offset);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const seconds = date.getSeconds();
+        const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
+        const hours = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
+        const minutes = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
+        const seconds = date.getSeconds() > 9 ? date.getSeconds() : `0${date.getSeconds()}`;
         const dateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         const severity = LogSeverity[this.level];
         const scope = this.scope ? `(${LogScope[this.scope]}) ` : '';
         const method = this.method ? `Method ${this.method}` : '';
         const data = this.data ? `: ${this.data}` : '';
-        return `[${severity} ${dateString}] ${scope}${method}: ${this.message}\n${data}`;
+        return `[${severity} ${dateString}] ${scope}${method}: ${this.message}\n${data}\n`;
     }
 }

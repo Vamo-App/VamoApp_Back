@@ -6,6 +6,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MissionService } from '../mission/mission.service';
 import { MissionCreateDto, MissionUpdateDto } from '../mission/dto';
 import { Mission } from '../mission/mission.entity';
+import { Tag } from '../tag/tag.entity';
+import { Place } from '../place/place.entity';
 
 @Controller('missions')
 @UseGuards(JwtAuthGuard)
@@ -20,7 +22,19 @@ export class MissionController {
 
     @Post()
     async create(@Body() missionDto: MissionCreateDto): Promise<Mission> {
+        const { _tag, _places } = missionDto;
         const mission: Mission = plainToInstance(Mission, missionDto);
+        if (_tag) {
+            mission.tag = new Tag();
+            mission.tag.tag = _tag;
+        }
+        if (_places) {
+            mission.places = _places.map(place => {
+                const newPlace = new Place();
+                newPlace.id = place;
+                return newPlace;
+            });
+        }
         return await this.service.create(mission);
     }
 

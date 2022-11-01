@@ -13,7 +13,7 @@ import { Post as PostEntity } from '../post/post.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
 import { PostCreateDto } from '../post/dto';
-import { LocationClass } from '../shared/utils/location';
+import { LocationDto } from '../shared/utils/location';
 
 @Controller('clients')
 @UseGuards(JwtAuthGuard)
@@ -120,7 +120,7 @@ export class ClientController {
     }
 
     @Post(':clientId/missions/report')
-    async reportLocationToAccomplishMissions(@Param('clientId') clientId: string, @Body() location:LocationClass): Promise<MissionClient[]> {
+    async reportLocationToAccomplishMissions(@Param('clientId') clientId: string, @Body() location:LocationDto): Promise<MissionClient[]> {
         return await this.service.reportLocationToAccomplishMissions(clientId, location);
     }
 
