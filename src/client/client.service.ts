@@ -16,7 +16,7 @@ import { LocationDto } from '../shared/utils/location';
 import { entitiesConstants } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { LogService } from '../log/log.service';
-import { planeText, distance } from '../shared/utils/functions';
+import { planeText, distance, getStackTrace } from '../shared/utils/functions';
 
 @Injectable()
 export class ClientService {
@@ -141,7 +141,7 @@ export class ClientService {
     }
 
     async getReviews(clientId: string): Promise<Review[]> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['reviews'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['reviews', 'reviews.place'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         if (!client.reviews.length)
@@ -237,10 +237,10 @@ export class ClientService {
     }
 
      async publishPost(clientId: string, post:Post): Promise<Post> {
-        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['weights', 'rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
+        const client: Client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        const place = await this.placeRepository.findOne({ where: {id: post.place.id} });
+        const place = await this.placeRepository.findOne({ where: {id: post.place.id}, relations: ['tags'] });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${post.place.id}) was not found`, HttpStatus.NOT_FOUND);
         post.client = client;
@@ -254,6 +254,7 @@ export class ClientService {
                     return ;
                 }
 
+                // si requiere que sea en algún tag en específico, se verifica que sí sea el tag, si no es, no se suma nada
                 if (mission.mission.tag && !post.place.tags.find(t => t.tag === mission.mission.tag.tag)) {
                     return ;
                 }
@@ -274,7 +275,7 @@ export class ClientService {
                         const rankFound = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
                         if (!rankFound) {
                             const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
-                            this.log.error(`Client ${client.id} has reached the maximum current rank, or it's needed to create a next rank`, error, 'Publish Post');
+                            this.log.error(`Client ${client.id} has reached the maximum current rank (${client.rank.name}), or it's needed to create a next rank`, error, getStackTrace(), 'Publish Post');
                             // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
                         }
                         else {
@@ -328,12 +329,13 @@ export class ClientService {
 
     async reportLocationToAccomplishMissions(clientId: string, location:LocationDto): Promise<MissionClient[]> {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
+        if (!client)
+            throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
         
         // encuentra todos los lugares que se encuentran en el radio de la locación dada
-        const allPlaces = await this.placeRepository.find();
+        const allPlaces = await this.placeRepository.find({ relations: ['tags'] });
         const places = allPlaces.filter(place => {
             const dist = distance(location.latitude, location.longitude, place.latitude, place.longitude);
-            console.log("distance", dist);
             return dist <= place.radius;
         });
 
@@ -347,7 +349,7 @@ export class ClientService {
                 // si requiere que sea en algún lugar en específico, se verifica que sí sea el lugar, si no es, no se suma nada
                 // o si se requiere que el lugar tenga algún tag en específico, se verifica que sí lo tenga, si no es, no se suma nada
                 if (!(mission.mission.places && mission.mission.places.length) && !mission.mission.tag) {
-                    this.log.warn(`The visit mission with the id (${mission.mission.id}) has no places or tag`, JSON.stringify(mission.mission), 'Report Location To Accomplish Missions');
+                    this.log.warn(`The visit mission with the id (${mission.mission.id}) has no places or tag`, mission.mission, 'Report Location To Accomplish Missions');
                     return ;
                 }
 
@@ -355,6 +357,7 @@ export class ClientService {
                     return ;
                 }
 
+                // si requiere que sea en algún tag en específico, se verifica que sí sea el tag, si no es, no se suma nada
                 if (mission.mission.tag && !places.find(place => place.tags.find(t => t.tag === mission.mission.tag.tag))) {
                     return ;
                 }
@@ -375,7 +378,7 @@ export class ClientService {
                         const rankFound = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
                         if (!rankFound) {
                             const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
-                            this.log.error(`Client ${client.id} has reached the maximum current rank, or it's needed to create a next rank`, error, 'Report Location');
+                            this.log.error(`Client ${client.id} has reached the maximum current rank (${client.rank.name}), or it's needed to create a next rank`, error, getStackTrace(), 'Report Location');
                             // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
                         }
                         else {

@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Place } from './place.entity';
 import { Tag } from '../tag/tag.entity';
 import { Client } from '../client/client.entity';
+import { MissionClient } from '../mission-client/mission-client.entity';
+import { Rank } from '../rank/rank.entity';
 import { Business } from '../business/business.entity';
 import { Review } from '../review/review.entity';
 import { Event } from '../event/event.entity';
@@ -13,7 +15,7 @@ import { LogModule } from '../log/log.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Place, Tag, Client, Business, Review, Event, Media]),
+    TypeOrmModule.forFeature([Place, Tag, Client, MissionClient, Rank, Business, Review, Event, Media]),
     LogModule
   ],
   providers: [PlaceService],

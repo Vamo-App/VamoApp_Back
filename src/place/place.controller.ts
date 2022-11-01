@@ -43,7 +43,6 @@ export class PlaceController {
 
     @Get()
     async getAll(@Query('q') q: string, @Query('clientId') clientId: string, @Query('eachWord') eachWord: boolean): Promise<Place[]> {
-        console.log(eachWord);
         return await this.service.getAll(q, clientId, eachWord);
     }
 
@@ -120,8 +119,9 @@ export class PlaceController {
 
     @Post(':placeId/reviews')
     async addReview(@Param('placeId') placeId: string, @Body() reviewDto: ReviewCreateDto): Promise<Review> {
+        const { clientId } = reviewDto;
         const review = plainToInstance(Review, reviewDto);
-        return await this.service.addReview(placeId, review);
+        return await this.service.addReview(placeId, clientId, review);
     }
 
     @Put(':placeId/reviews/:reviewId')

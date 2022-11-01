@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const deg2rad = (deg: number): number => deg * (Math.PI / 180);
 
@@ -25,7 +27,9 @@ export const latinize = (str: string): string => {
 export const getStackTrace = function() {
     var obj: any = {};
     Error.captureStackTrace(obj, getStackTrace);
-    return obj.stack;
+    const rootPath = process.cwd() + '\\';
+    let stackTrace = obj.stack.split(rootPath).join('');
+    return stackTrace;
 };
 
 export const planeText = (text: string): string => {
@@ -36,3 +40,55 @@ export const planeText = (text: string): string => {
     return text;
 }
 
+export const appendToLogFile = (fileName: string, log: string):void => {
+    const fs = require('fs');
+    const path = require('path');
+    const logPath = path.join(__dirname, '..', '..', 'logs');
+    if (!fs.existsSync(logPath)) {
+        fs.mkdirSync(logPath);
+    }
+    const filePath = path.join(logPath, fileName);
+    fs.appendFileSync(filePath, log);
+}
+
+export const sendLogEmail = (logHtmlString: string):string|void => {
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.NORESPONSE_EMAIL,
+            pass: process.env.NORESPONSE_EMAIL_PASSWORD
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.NORESPONSE_EMAIL,
+        to: process.env.VAMO_EMAIL,
+        subject: "[Vamo'] Error en el backend",
+        text: "Hubo un error en el servidor backend de Vamo'",
+        html: `
+        <img src="cid:500@vamo.com" width="600"/>
+        <br>
+        <p>Hubo un error en el servidor backend de Vamo'</p>
+        ${logHtmlString}
+        `,
+        attachments: [
+            {
+                filename: 'internal-server-error.png',
+                path: __dirname + '../../../../public/assets/internal-server-error.png',
+                cid: '500@vamo.com' // should be as unique as possible
+            }
+        ],
+    };
+
+    const info = transporter.sendMail(mailOptions, (error: any, info: any) => {
+        if (error) {
+            console.log(error);
+        }
+    });
+
+    if (info)
+        return 'Email sent: ' + info.response;
+}

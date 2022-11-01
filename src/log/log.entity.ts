@@ -56,4 +56,21 @@ export class Log {
         const data = this.data ? `: ${this.data}` : '';
         return `[${severity} ${dateString}] ${scope}${method}: ${this.message}\n${data}\n`;
     }
+
+    toHtmlString(data: object): string {
+        const severity = LogSeverity[this.level];
+        const method = this.method ? ` at ${this.method}` : '';
+        let stack = this.stack.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        return `
+        <br>
+        <h3>${severity}${method}</h3>
+        <p style="font-size: 1.2em; font-family: consolas, monospace;">
+            ${this.message}
+        </p>
+        <pre>${JSON.stringify(data, undefined, 2)}</pre>
+        <h4>Stack</h4>
+        <p style="font-size: 1.0em; font-family: consolas, monospace;">
+        ${stack}</p>
+        `
+    }
 }

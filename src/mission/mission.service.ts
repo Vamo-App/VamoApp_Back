@@ -8,6 +8,7 @@ import { MissionClient } from '../mission-client/mission-client.entity';
 import { Client } from '../client/client.entity';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { Place } from '../place/place.entity';
+import { Tag } from '../tag/tag.entity';
 
 @Injectable()
 export class MissionService {
@@ -19,7 +20,9 @@ export class MissionService {
         @InjectRepository(Client)
         private readonly clientRepository: Repository<Client>,
         @InjectRepository(Place)
-        private readonly placeRepository: Repository<Place>
+        private readonly placeRepository: Repository<Place>,
+        @InjectRepository(Tag)
+        private readonly tagRepository: Repository<Tag>,
     ) {}
 
     async getAll(): Promise<Mission[]> {
@@ -31,6 +34,13 @@ export class MissionService {
 
         if (mission.places && mission.places.length && mission.tag)
             throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.BAD_REQUEST);
+
+        if (mission.tag) {
+            let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
+            if (!tag)
+                tag = await this.tagRepository.save(mission.tag);
+            mission.tag = tag;
+        }
 
         if (mission.places) {
             const realPlaces: Place[] = [];

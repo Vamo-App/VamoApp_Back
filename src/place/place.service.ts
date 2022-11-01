@@ -6,15 +6,18 @@ import { Repository } from 'typeorm';
 import { Place } from './place.entity';
 import { Tag } from '../tag/tag.entity';
 import { Client } from '../client/client.entity';
+import { MissionClient } from '../mission-client/mission-client.entity';
+import { Rank } from '../rank/rank.entity';
 import { Business } from '../business/business.entity';
 import { Review } from '../review/review.entity';
 import { Post } from '../post/post.entity';
 import { Event } from '../event/event.entity';
 import { Media } from '../media/media.entity';
 import { RequestInfo, RequestInit } from 'node-fetch';
+import { MissionType } from '../shared/enums/mission-type.enum';
 import { minimumRadius } from '../shared/utils/constants';
 import { LogService } from '../log/log.service';
-import { planeText } from '../shared/utils/functions';
+import { getStackTrace, planeText } from '../shared/utils/functions';
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
   import('node-fetch').then(({ default: fetch }) => fetch(url, init));
@@ -28,6 +31,10 @@ export class PlaceService {
         private readonly tagRepository: Repository<Tag>,
         @InjectRepository(Client)
         private readonly clientRepository: Repository<Client>,
+        @InjectRepository(MissionClient)
+        private readonly missionClientRepository: Repository<MissionClient>,
+        @InjectRepository(Rank)
+        private readonly rankRepository: Repository<Rank> ,
         @InjectRepository(Business)
         private readonly businessRepository: Repository<Business>,
         @InjectRepository(Review)
@@ -142,12 +149,12 @@ export class PlaceService {
                         return res.json();
                     });
             if (status !== 200) {
-                this.log.error(`Error status ${status} when calling PositionStack API`, JSON.stringify(response), 'Create Place');
+                this.log.error(`Error status ${status} when calling PositionStack API`, response, getStackTrace(), 'Create Place');
                 throw new BusinessLogicException(`Error in the request`, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             if (!response || !response.data || !response.data[0] || !response.data[0].latitude || !response.data[0].longitude) {
-                this.log.warn(`The address '${fullAddress}' was not found by PositionStack API`, JSON.stringify(response), 'Create Place');
+                this.log.warn(`The address '${fullAddress}' was not found by PositionStack API`, response, 'Create Place');
                 throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
             }
             
@@ -162,11 +169,10 @@ export class PlaceService {
                 }
 
                 if (i === -1) {
-                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but any was found in the country`, JSON.stringify(response), 'Create Place');
+                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but any was found in the country`, response, 'Create Place');
                     throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
                 } else {
-                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but at least one found in the country`, JSON.stringify(response), 'Create Place');
-                    console.log(`WARNING: The address '${fullAddress}' was found more than once by the API, but it was found in the country '${place.country}'`);
+                    this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but at least one found in the country`, response, 'Create Place');
                 }
             }
 
@@ -221,9 +227,61 @@ export class PlaceService {
         return ;
     }
 
-    async addReview(placeId: string, review: Review): Promise<Review> {
-        // TODO T
-        return ;
+    async addReview(placeId: string, clientId: string, review: Review): Promise<Review> {
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['tags'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['rank', 'missions', 'missions.mission', 'missions.mission.places', 'missions.mission.tag'] });
+        if (!client)
+            throw new BusinessLogicException(`Client with id ${clientId} was not found`, HttpStatus.NOT_FOUND);
+        review.client = client;
+        review.place = place;
+        const newReview = await this.reviewRepository.save(review);
+
+        client.missions.forEach(async mission => {
+            if (mission.percentage < 1.0 && mission.mission.type === MissionType.REVIEW) {
+                // si requiere que sea en algún lugar en específico, se verifica que sí sea el lugar, si no es, no se suma nada
+                if (mission.mission.places.length && !mission.mission.places.find(p => p.id === review.place.id)) {
+                    return ;
+                }
+
+                // si requiere que sea en algún tag en específico, se verifica que sí sea el tag, si no es, no se suma nada
+                if (mission.mission.tag && !review.place.tags.find(t => t.tag === mission.mission.tag.tag)) {
+                    return ;
+                }
+
+                // si requiredN = 5 (se deben subir 5 reviews), se suma 1/5 que es el 20% al porcentaje de la misión
+                mission.percentage += 1/mission.mission.requiredN;
+
+                if (mission.percentage > 0.99)
+                    mission.percentage = 1.0; // se aproxima
+
+                // si se cumplió la misión (100%) se le suma el XP al usuario 
+                if (mission.percentage >= 1.0) {
+                    mission.percentage = 1.0
+                    client.xp += mission.mission.prizeXp;
+                    if (client.xp >= client.rank.xpNext) {
+                        // si el XP del usuario es mayor o igual al XP necesario para subir de rango, se actualiza el rango
+                        client.xp -= client.rank.xpNext;
+                        const rankFound = await this.rankRepository.findOne({ where: {level: client.rank.level + 1} });
+                        if (!rankFound) {
+                            const error = new BusinessLogicException(`The rank with the level (${client.rank.level + 1}) was not found`, HttpStatus.NOT_FOUND);
+                            this.log.error(`Client ${client.id} has reached the maximum current rank (${client.rank.name}), or it's needed to create a next rank`, error, getStackTrace(), 'Publish Post');
+                            // no se lanza el error, ya que realmente no es un error del método, simplemente el usuario ya llegó al máximo rango actual
+                        }
+                        else {
+                            client.rank = rankFound;
+                        }
+                    }
+                }
+
+                await this.missionClientRepository.save(mission);
+            } 
+        });
+        const clientUpdated = await this.clientRepository.save(client); // actualizar cliente
+
+        newReview.client = clientUpdated;
+        return newReview;
     }
 
     async updateReview(placeId: string, reviewId: string, review: Review): Promise<Review> {

@@ -1,5 +1,5 @@
 export enum LogScope {
-    DEV = 'DEV',
     USER = 'USER',
+    SYSTEM = 'SYSTEM',
     OTHER = 'OTHER'
 }
