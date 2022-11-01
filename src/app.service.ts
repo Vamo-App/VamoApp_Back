@@ -1,7 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-//import { ConfigService } from '@nestjs/config';
 import { Client } from './client/client.entity';
 import { Place } from './place/place.entity';
 
@@ -17,11 +16,9 @@ export class AppService {
   async vamo(clientIds: string[], longitude: number, latitude: number, radius: number ): Promise<Place[]> {
     let client: Client[] = [];
     let place: Place[] = [];
-    //make a for in 
     for (let i = 0; i < clientIds.length; i++) {
       client.push(await this.clientRepository.findOne({where: {id: clientIds[i]}})); 
     }
-
     return place; 
   }
 

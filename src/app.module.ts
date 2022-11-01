@@ -17,6 +17,7 @@ import { EventModule } from './event/event.module';
 import { MediaModule } from './media/media.module';
 import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
+import { Client } from './client/client.entity';
 
 @Module({
   imports: [
@@ -46,10 +47,11 @@ import { AuthModule } from './auth/auth.module';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
+    TypeOrmModule.forFeature([Client]),
     VamoUserModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService ],
 })
 export class AppModule {}
