@@ -9,6 +9,8 @@ import { Client } from '../client/client.entity';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { Place } from '../place/place.entity';
 import { Tag } from '../tag/tag.entity';
+import { LogService } from '../log/log.service';
+import { LogScope } from '../shared/enums/log-scope.enum';
 
 @Injectable()
 export class MissionService {
@@ -23,6 +25,7 @@ export class MissionService {
         private readonly placeRepository: Repository<Place>,
         @InjectRepository(Tag)
         private readonly tagRepository: Repository<Tag>,
+        private readonly log: LogService
     ) {}
 
     async getAll(): Promise<Mission[]> {
@@ -75,5 +78,36 @@ export class MissionService {
             throw new BusinessLogicException(`The mission with the id ${missionId} was not found`, HttpStatus.NOT_FOUND);
         }
         return await this.repository.save(mission);
+    }
+
+    async delete(missionId: string): Promise<void> {
+        const mission = await this.repository.findOne({ where: {id:missionId} });
+        if (!mission)
+            throw new BusinessLogicException(`The mission with the id ${missionId} was not found`, HttpStatus.NOT_FOUND);
+        const clients: Client[] = await this.clientRepository.find({ relations: ['missions', 'missions.mission'] });
+        let countDeleted: number = 0;
+        for (const client of clients) {
+            for (const missionClient of client.missions) {
+                if (missionClient.mission.id === missionId) {
+                    if (missionClient.percentage >= 1.0) {
+                        this.log.info(`The missionClient with id (${missionClient.id}) couldn't be deleted because it was completed by the client with id (${client.id})`, 'Delete mission', null, LogScope.ADMIN);
+                        countDeleted = -Infinity;
+                    } else {
+                        countDeleted++;
+                        await this.missionClientRepository.delete(missionClient.id);
+                    }
+                }
+            }
+        }
+        if (countDeleted === -Infinity) {
+            if (mission.base) {
+                mission.base = false;
+                await this.repository.save(mission);
+                throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client, instead 'base was set to false' (all the instances not completed were deleted)`, HttpStatus.PRECONDITION_FAILED);
+            }
+            throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client (all the instances not completed were deleted)`, HttpStatus.PRECONDITION_FAILED);
+        }
+        await this.repository.delete(missionId);
+        throw new BusinessLogicException(`The mission with the id (${missionId}) was deleted, ${countDeleted} uncomplete instances were deleted`, HttpStatus.OK);
     }
 }
