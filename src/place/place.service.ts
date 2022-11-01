@@ -290,8 +290,16 @@ export class PlaceService {
     }
 
     async deleteReview(placeId: string, reviewId: string): Promise<Review> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const review = await this.reviewRepository.findOne({ where: {id: reviewId}, relations:['place', 'client'] });
+        if (!review)
+            throw new BusinessLogicException(`Review with id ${reviewId} was not found`, HttpStatus.NOT_FOUND);
+        
+        await this.reviewRepository.remove(review);
+        return review;
     }
 
     async getEvents(placeId: string): Promise<Event[]> {

@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MissionService } from '../mission/mission.service';
 import { MissionCreateDto, MissionUpdateDto } from '../mission/dto';
 import { Mission } from '../mission/mission.entity';
+import { MissionClient } from '../mission-client/mission-client.entity';
 import { Tag } from '../tag/tag.entity';
 import { Place } from '../place/place.entity';
 
@@ -42,5 +43,10 @@ export class MissionController {
     async update(@Param('missionId') missionId: string, @Body() missionDto: MissionUpdateDto): Promise<Mission> {
         const mission: Mission = plainToInstance(Mission, missionDto);
         return await this.service.update(missionId, mission);
+    }
+
+    @Delete(':missionId')
+    async delete(@Param('missionId') missionId: string): Promise<void> {
+        return await this.service.delete(missionId);
     }
 }

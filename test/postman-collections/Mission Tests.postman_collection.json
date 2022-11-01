@@ -50,14 +50,14 @@
 			"response": []
 		},
 		{
-			"name": "Create mission",
+			"name": "Create place by coordinates (don't use API)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"var data = pm.response.json()\r",
-							"pm.globals.set(\"missionId\", data.id);\r",
+							"pm.globals.set(\"placeId\", data.id);\r",
 							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
@@ -82,7 +82,124 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Publish 2 posts\",\r\n    \"description\":\"Everyone will se how cool are you!\",\r\n    \"prizeXp\":1000,\r\n    \"base\":true,\r\n    \"type\":\"POST\",\r\n    \"requiredN\":2\r\n}",
+					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 58 #10-32\",\r\n    \"latitude\":4.644950383828928,\r\n    \"longitude\":-74.06378545993776,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/admin",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create place 2 by coordinates (don't use API)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"placeId2\", data.id);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Plaza de Bolívar\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"La Candelaria\",\r\n    \"address\":\"Cra 7. #11-10\",\r\n    \"latitude\":4.59813,\r\n    \"longitude\":-74.07605,\r\n    \"tags\":[\r\n        \"park\",\r\n        \"cultural\",\r\n        \"legacy\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/admin",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create mission post (not base)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"missionId\", data.id);\r",
+							"pm.test(\"Mission has no tag\", function () {\r",
+							"    var tag = pm.response.json().tag;\r",
+							"    if (tag === undefined) ;\r",
+							"    else pm.expect(tag.tag).to.be.null();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mission has no places\", function () {\r",
+							"    var places = pm.response.json().places;\r",
+							"    if (places === undefined) ;\r",
+							"    else pm.expect(places.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Publish 3 posts\",\r\n    \"description\":\"Everyone will se how cool are you!\",\r\n    \"prizeXp\":1100,\r\n    \"base\":false,\r\n    \"type\":\"POST\",\r\n    \"requiredN\":3\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -96,6 +213,940 @@
 					],
 					"path": [
 						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create mission review (not base)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"missionId2\", data.id);\r",
+							"pm.test(\"Mission has no tag\", function () {\r",
+							"    var tag = pm.response.json().tag;\r",
+							"    if (tag === undefined) ;\r",
+							"    else pm.expect(tag.tag).to.be.null();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mission has no places\", function () {\r",
+							"    var places = pm.response.json().places;\r",
+							"    if (places === undefined) ;\r",
+							"    else pm.expect(places.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Review 2 places\",\r\n    \"description\":\"Let us know if you like our recommendations!\",\r\n    \"prizeXp\":700,\r\n    \"base\":false,\r\n    \"type\":\"REVIEW\",\r\n    \"requiredN\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create mission visit (not base)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"missionId3\", data.id);\r",
+							"pm.test(\"Mission has no tag\", function () {\r",
+							"    var tag = pm.response.json().tag;\r",
+							"    if (tag === undefined) ;\r",
+							"    else pm.expect(tag.tag).to.be.null();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mission has no places\", function () {\r",
+							"    var places = pm.response.json().places;\r",
+							"    pm.expect(places.length).to.equal(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Visit Theatron\",\r\n    \"description\":\"You would like it for sure\",\r\n    \"prizeXp\":600,\r\n    \"base\":false,\r\n    \"type\":\"VISIT\",\r\n    \"requiredN\":1,\r\n    \"_places\":[\r\n        \"{{placeId}}\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create mission post (base)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"missionId4\", data.id);\r",
+							"pm.test(\"Mission has tag 'disco'\", function () {\r",
+							"    var tag = pm.response.json().tag;\r",
+							"    pm.expect(tag.tag).to.equal(\"disco\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mission has no places\", function () {\r",
+							"    var places = pm.response.json().places;\r",
+							"    if (places === undefined) ;\r",
+							"    else pm.expect(places.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Publish 1 post on a disco\",\r\n    \"description\":\"Publish 1 post on a place with the tag 'disco'\",\r\n    \"prizeXp\":600,\r\n    \"base\":true,\r\n    \"type\":\"POST\",\r\n    \"requiredN\":1,\r\n    \"_tag\":\"disco\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create mission post (base) 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"missionId5\", data.id);\r",
+							"pm.test(\"Mission has tag 'disco'\", function () {\r",
+							"    var tag = pm.response.json().tag;\r",
+							"    if (tag === undefined) ;\r",
+							"    else pm.expect(tag.tag).to.be.null();\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mission has no places\", function () {\r",
+							"    var places = pm.response.json().places;\r",
+							"    pm.expect(places.length).to.equal(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"Publis a post from Plaza de Bolívar\",\r\n    \"description\":\"Publish 1 post at Plaza de Bolívar\",\r\n    \"prizeXp\":300,\r\n    \"base\":true,\r\n    \"type\":\"POST\",\r\n    \"requiredN\":1,\r\n    \"_places\":[\r\n        \"{{placeId2}}\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"clientId\", data.id);\r",
+							"pm.globals.set(\"clientEmail\", data.email);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get missions of client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Complete mission list is empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.complete.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Incomplete mission list is not empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.incomplete.length).to.equal(2);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Publish post (complete mission 4)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"postId\", data.id);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"picture\":\"mypic.com/user\",\r\n    \"description\":\"Such a nice place to party!\",\r\n    \"placeId\":\"{{placeId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}/posts",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission not completed 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission not completed 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId2}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission not completed 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId3}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId3}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission completed 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 412\", function () {\r",
+							"    pm.response.to.have.status(412);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId4}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission not completed 5",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId5}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId5}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get missions of client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Complete mission list is not empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.complete.length).to.equal(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Incomplete mission list is empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.incomplete.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete mission of deleted client 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId4}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a place 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId2}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{placeId2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a place",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{placeId}}"
 					]
 				}
 			},

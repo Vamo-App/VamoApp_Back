@@ -7,9 +7,10 @@ import { MissionClient } from '../mission-client/mission-client.entity';
 import { Client } from '../client/client.entity';
 import { Place } from '../place/place.entity';
 import { Tag } from '../tag/tag.entity';
+import { LogModule } from '../log/log.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Mission, MissionClient, Client, Place, Tag])],
+  imports: [TypeOrmModule.forFeature([Mission, MissionClient, Client, Place, Tag]), LogModule],
   providers: [MissionService],
   controllers: [MissionController]
 })
