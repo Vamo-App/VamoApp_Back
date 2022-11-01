@@ -20,6 +20,7 @@ export class AppController {
     return await this.appService.vamo(clients, +longitude, +latitude, +radius);
   }
 
+
   @Get("login")
   async login(): Promise<Client | Business> {
     //TODO B
