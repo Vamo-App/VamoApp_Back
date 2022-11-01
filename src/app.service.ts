@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,9 +8,11 @@ import { Place } from './place/place.entity';
 import { Weight } from './weight/weight.entity';
 =======
 import { Inject, Injectable } from '@nestjs/common';
+=======
+import { Injectable } from '@nestjs/common';
+>>>>>>> 39dc3f2 (pruebas req funcional lugares favorables.)
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-//import { ConfigService } from '@nestjs/config';
 import { Client } from './client/client.entity';
 import { Place } from './place/place.entity';
 >>>>>>> 737b08a (archivo debug, y planteamiento del app.controller.ts)
@@ -33,6 +36,7 @@ export class AppService {
     let client: Client[] = [];
     let place: Place[] = [];
 <<<<<<< HEAD
+<<<<<<< HEAD
     for (let i = 0; i < clientIds.length; i++) {
       client.push(await this.clientRepository.findOne({where: {id: clientIds[i]}})); 
     }
@@ -51,6 +55,11 @@ export class AppService {
     }
 >>>>>>> 737b08a (archivo debug, y planteamiento del app.controller.ts)
 
+=======
+    for (let i = 0; i < clientIds.length; i++) {
+      client.push(await this.clientRepository.findOne({where: {id: clientIds[i]}})); 
+    }
+>>>>>>> 39dc3f2 (pruebas req funcional lugares favorables.)
     return place; 
   }
 

@@ -54,6 +54,9 @@ import { Place } from './place/place.entity';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
+    TypeOrmModule.forFeature([Client]),
+    VamoUserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService ],
