@@ -19,10 +19,12 @@ import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
 import { Client } from './client/client.entity';
 import { LogModule } from './log/log.module';
+import { Place } from './place/place.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    TypeOrmModule.forFeature([Client,Place]),
     ClientModule, 
     WeightModule, 
     TagModule, 
