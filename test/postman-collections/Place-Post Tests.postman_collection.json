@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "ade99aee-5990-40ff-9628-467395459b47",
-		"name": "Place Tests",
+		"_postman_id": "03ea1eb9-4503-4178-87af-6dcf5a41d465",
+		"name": "Place-Post Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "18901686"
 	},
@@ -50,7 +50,7 @@
 			"response": []
 		},
 		{
-			"name": "Create place (API call !)",
+			"name": "Create place by coordinates (don't use API)",
 			"event": [
 				{
 					"listen": "test",
@@ -59,12 +59,6 @@
 							"var data = pm.response.json()\r",
 							"pm.globals.set(\"placeId\", data.id);\r",
 							"\r",
-							"pm.test(\"Place has location\", function () {\r",
-							"    var { latitude, longitude } = pm.response.json();\r",
-							"    pm.expect(latitude).not.eq(undefined);\r",
-							"    pm.expect(longitude).not.eq(undefined);\r",
-							"});\r",
-							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
@@ -88,7 +82,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Dakiti Bar\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Teusaquillo\",\r\n    \"address\":\"Carrera 27 #52-66\",\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"music\",\r\n        \"colorful\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/dakiti.bar\",\r\n    \"radius\":0.010\r\n}",
+					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 58 #10-32\",\r\n    \"latitude\":4.644950383828928,\r\n    \"longitude\":-74.06378545993776,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -109,19 +103,19 @@
 			"response": []
 		},
 		{
-			"name": "Create place by coordinates (don't use API)",
+			"name": "Create client",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"var data = pm.response.json()\r",
-							"pm.globals.set(\"placeId2\", data.id);\r",
+							"pm.globals.set(\"clientId\", data.id);\r",
+							"pm.globals.set(\"clientEmail\", data.email);\r",
 							"\r",
-							"pm.test(\"Place has location\", function () {\r",
-							"    var { latitude, longitude } = pm.response.json();\r",
-							"    pm.expect(latitude).not.eq(undefined);\r",
-							"    pm.expect(longitude).not.eq(undefined);\r",
+							"pm.test(\"Client level is level=0\", function () {\r",
+							"    var rank = pm.response.json().rank;\r",
+							"    pm.expect(rank.level).to.equal(0);\r",
 							"});\r",
 							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
@@ -147,7 +141,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 0 #0-0\",\r\n    \"latitude\":0.1,\r\n    \"longitude\":0.1,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
+					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\"\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -155,20 +149,73 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/admin",
+					"raw": "{{baseUrl}}/clients",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"places",
-						"admin"
+						"clients"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Update a place",
+			"name": "Publish post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"postId\", data.id);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"picture\":\"mypic.com/user\",\r\n    \"description\":\"Such a nice place to party!\",\r\n    \"placeId\":\"{{placeId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}/posts",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a post",
 			"event": [
 				{
 					"listen": "test",
@@ -197,7 +244,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"address\":\"Cl. 58 #10-32\",\r\n    \"latitude\":4.644950383828928,\r\n    \"longitude\":-74.06378545993776\r\n}",
+					"raw": "{\r\n    \"visible\":false\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -205,361 +252,81 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId2}}",
+					"raw": "{{baseUrl}}/clients/{{clientId}}/posts/{{postId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"posts",
+						"{{postId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get posts of a place",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Posts list is not empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.length).to.greaterThan(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId}}/posts",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
-						"{{placeId2}}"
+						"{{placeId}}",
+						"posts"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get all places",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all places by keyword (name)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places?q=Theat",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "Theat"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all places by keyword (tag)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places?q=disc",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "disc"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all places by keyword (name with other things)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places?q=++tHÉa+++++5+++&eachWord=true",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "++tHÉa+++++5+++"
-						},
-						{
-							"key": "eachWord",
-							"value": "true"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all places by unknown keyword",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
-							"    pm.response.to.have.status(204);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places?q=hall",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "hall"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get one place",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places",
-						"{{placeId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete a place 2",
+			"name": "Delete post",
 			"event": [
 				{
 					"listen": "test",
@@ -596,13 +363,65 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId2}}",
+					"raw": "{{baseUrl}}/clients/{{clientId}}/posts/{{postId}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"places",
-						"{{placeId2}}"
+						"clients",
+						"{{clientId}}",
+						"posts",
+						"{{postId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}"
 					]
 				}
 			},

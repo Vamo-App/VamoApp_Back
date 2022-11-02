@@ -406,6 +406,56 @@
 			"response": []
 		},
 		{
+			"name": "Update a mission",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\":\"Go to a disco, have fun and upload a post!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/missions/{{missionId4}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"missions",
+						"{{missionId4}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create mission post (base) 2",
 			"event": [
 				{
@@ -522,6 +572,70 @@
 		},
 		{
 			"name": "Get missions of client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Complete mission list is empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.complete.length).to.equal(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Incomplete mission list is not empty\", function () {\r",
+							"    var data = pm.response.json();\r",
+							"    pm.expect(data.incomplete.length).to.equal(2);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{clientId}}/missions",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{clientId}}",
+						"missions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get missions of client Copy",
 			"event": [
 				{
 					"listen": "test",

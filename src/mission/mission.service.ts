@@ -36,14 +36,7 @@ export class MissionService {
         const clients: Client[] = await this.clientRepository.find();
 
         if (mission.places && mission.places.length && mission.tag)
-            throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.BAD_REQUEST);
-
-        if (mission.tag) {
-            let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
-            if (!tag)
-                tag = await this.tagRepository.save(mission.tag);
-            mission.tag = tag;
-        }
+            throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.PRECONDITION_FAILED);
 
         if (mission.places) {
             const realPlaces: Place[] = [];
@@ -57,8 +50,15 @@ export class MissionService {
         }
 
         if (mission.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
-            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.BAD_REQUEST);
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
 
+        if (mission.tag) {
+            let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
+            if (!tag)
+                tag = await this.tagRepository.save(mission.tag);
+            mission.tag = tag;
+        }
+    
         const missionCreated = await this.repository.save(mission);
 
         clients.forEach(async client => {
@@ -72,12 +72,37 @@ export class MissionService {
         return missionCreated;
     }
 
+    // TODO ? realmente se podría hacer un update de la misión? o solo se podría cambiar el base a false (que ya no vuelva a ser recomendada)?
+    // o tal vez solo se deberían poder actualziar el nombre y la descripción, es decir datos que no afecten el cumplimiento de la misión
     async update(missionId: string, mission: Mission): Promise<Mission> {
         const missionToUpdate = await this.repository.findOne({ where: {id:missionId} });
-        if (!missionToUpdate) {
+        if (!missionToUpdate)
             throw new BusinessLogicException(`The mission with the id ${missionId} was not found`, HttpStatus.NOT_FOUND);
+        if (missionToUpdate.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
+
+        if (mission.places) {
+            const realPlaces: Place[] = [];
+            for (const place of mission.places) {
+                const realPlace = await this.placeRepository.findOne({ where: {id:place.id} });
+                if (!realPlace)
+                    throw new BusinessLogicException(`The place with id (${place.id}) was not found`, HttpStatus.NOT_FOUND);
+                realPlaces.push(realPlace);
+            }
+            mission.places = realPlaces;
         }
-        return await this.repository.save(mission);
+
+        if (missionToUpdate.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
+
+        if (mission.tag) {
+            let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
+            if (!tag)
+                tag = await this.tagRepository.save(mission.tag);
+            mission.tag = tag;
+        }
+
+        return await this.repository.save({...missionToUpdate, ...mission});
     }
 
     async delete(missionId: string): Promise<void> {

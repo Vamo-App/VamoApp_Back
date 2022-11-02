@@ -70,12 +70,7 @@ export class PlaceController {
 
     @Put(':placeId')
     async update(@Param('placeId') placeId: string, @Body() placeDto: PlaceUpdateDto): Promise<Place> {
-        const { businessId } = placeDto;
         const place = plainToInstance(Place, placeDto);
-        if (businessId) {
-            place.business = new Business();
-            place.business.id = businessId;
-        }
         return await this.service.update(placeId, place);
     }
 

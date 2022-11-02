@@ -103,27 +103,12 @@ export class PlaceService {
     }
 
     async create(place: Place): Promise<Place> {
-        /* // ya lo verifica el pipe con whitelist
-        for (const item in place) {
-            if (['id', 'average', 'clientsPending', 'clientsLiked', 'reviews', 'posts', 'business', 'placeMissions', 'medias', 'events'].findIndex(x => x === item) !== -1) {
-                if (place[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
-            }
-        }*/
-
         // el negocio a asociar debe existir
         if (place.business) {
             const business = await this.businessRepository.findOne({ where: {id: place.business.id} });
             if (!business)
                 throw new BusinessLogicException(`Business with id ${place.business.id} was not found`, HttpStatus.NOT_FOUND);
             place.business = business;
-        }
-
-        // si hay algun tag del lugar que no existe, se crea
-        for (const tag of place.tags) {
-            const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
-            if (!tagFound)
-                await this.tagRepository.save(tag);
         }
 
         // IMPORTANTE: Si NO se envían como parámetro 'longitude' y 'latitude', se hace la solicitud a una API externa LIMITADA. Si se conocen estos dos datos, es mejor enviarlos como parámetro
@@ -182,12 +167,33 @@ export class PlaceService {
             place.radius = minimumRadius/response.data[i].confidence + (place.radius || 0);
         }
 
+        // si hay algun tag del lugar que no existe, se crea
+        for (const tag of place.tags) {
+            const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
+            if (!tagFound)
+                await this.tagRepository.save(tag);
+        }
+        
         return this.placeRepository.save(place);
     }
 
     async update(placeId: string, place: Place): Promise<Place> {
-        // TODO T
-        return ;
+        const placeFound = await this.placeRepository.findOne({ where: {id: placeId} });
+        if (!placeFound)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+
+        // ya no se hace un llamado a la API externa, simplemente se modifican los atributos que se envíen, es decir se toma la latitud, longitud, dirección, etc. que se envíen
+        if (place.longitude || place.latitude) {
+            if (!place.longitude || !place.latitude)
+                throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.PRECONDITION_FAILED);
+        }
+
+        place.addressLabel = place.address;
+        if (place.radius) {
+            place.radius = place.radius < minimumRadius ? minimumRadius : place.radius;
+        }
+        
+        return this.placeRepository.save({ ...placeFound, ...place });
     }
 
     async delete(placeId: string): Promise<void> {
@@ -239,8 +245,12 @@ export class PlaceService {
     }
 
     async getPosts(placeId: string): Promise<Post[]> {
-        // TODO T
-        return ;
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['posts'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        if (!place.posts.length)
+            throw new BusinessLogicException(`Place with id ${placeId} has no posts`, HttpStatus.NO_CONTENT);
+        return place.posts;
     }
 
     async getReviews(placeId: string): Promise<Review[]> {

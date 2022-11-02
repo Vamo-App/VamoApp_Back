@@ -45,14 +45,6 @@ export class ClientService {
         if (clientFound)
             throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
-        /* // ya lo verifica el pipe con whitelist
-        for (const item in client) {
-            if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1) {
-                if (client[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
-            }
-        }*/
-
         // settear el rango 0 por defecto, si no existe, crearlo
         let rank = await this.rankRepository.findOne({ where: { level:0 } });
         if (!rank) {
@@ -124,12 +116,6 @@ export class ClientService {
                 throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
         }
 
-        /* // ya lo verifica el pipe con whitelist
-        for (const item in client) {
-            if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1)
-                if (client[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually modified`, HttpStatus.FORBIDDEN);
-        }*/
         return await this.clientRepository.save({...clientToUpdate, ...client});
     }
 
