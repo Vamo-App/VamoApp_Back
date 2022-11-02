@@ -197,14 +197,35 @@ export class PlaceService {
         await this.placeRepository.remove(place);
     }
 
-    async addTag(placeId: string, tag: string): Promise<Place> {
-        // TODO T
-        return ;
+    async addTag(placeId: string, tag: Tag): Promise<Place> {
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['tags'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
+        if (!tagFound)
+            tag = await this.tagRepository.save(tag);
+
+        place.tags.push(tag);
+        return this.placeRepository.save(place);
     }
 
-    async removeTag(placeId: string, tag: string): Promise<Place> {
-        // TODO T
-        return ;
+    async removeTag(placeId: string, tag: Tag): Promise<Place> {
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['tags'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+            
+        const tagFound = await this.tagRepository.findOne({ where: { tag: tag.tag } });
+        if (!tagFound)
+            throw new BusinessLogicException(`Tag with name ${tag.tag} was not found`, HttpStatus.NOT_FOUND);
+
+        const tagIndex = place.tags.findIndex(t => t.tag === tagFound.tag)
+        if (tagIndex === -1)
+            throw new BusinessLogicException(`Tag with name ${tag.tag} is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
+        
+        place.tags.splice(tagIndex, 1);
+        const placeUpdated = await this.placeRepository.save(place);
+        return placeUpdated;
     }
 
     async associateBusiness(placeId: string, businessId: string): Promise<Place> {
@@ -223,8 +244,12 @@ export class PlaceService {
     }
 
     async getReviews(placeId: string): Promise<Review[]> {
-        // TODO T
-        return ;
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['reviews'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        if (!place.reviews.length)
+            throw new BusinessLogicException(`Place with id ${placeId} has no reviews`, HttpStatus.NO_CONTENT);
+        return place.reviews;
     }
 
     async addReview(placeId: string, clientId: string, review: Review): Promise<Review> {
@@ -285,18 +310,34 @@ export class PlaceService {
     }
 
     async updateReview(placeId: string, reviewId: string, review: Review): Promise<Review> {
-        // TODO T
-        return ;
-    }
-
-    async deleteReview(placeId: string, reviewId: string): Promise<Review> {
-        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['reviews'] });
         if (!place)
             throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
         
-        const review = await this.reviewRepository.findOne({ where: {id: reviewId}, relations:['place', 'client'] });
+        const reviewFound = await this.reviewRepository.findOne({ where: {id: reviewId} });
+        if (!reviewFound)
+            throw new BusinessLogicException(`Review with id ${reviewId} was not found`, HttpStatus.NOT_FOUND);
+
+        const reviewIndex = place.reviews.findIndex(r => r.id === reviewFound.id);
+        if (reviewIndex === -1)
+            throw new BusinessLogicException(`Review with id ${reviewId} is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
+
+        const reviewUpdated = await this.reviewRepository.save({ ...reviewFound, ...review });
+        return reviewUpdated;
+    }
+
+    async deleteReview(placeId: string, reviewId: string): Promise<Review> {
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['reviews'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const review = await this.reviewRepository.findOne({ where: {id: reviewId} });
         if (!review)
             throw new BusinessLogicException(`Review with id ${reviewId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const reviewIndex = place.reviews.findIndex(r => r.id === review.id);
+        if (reviewIndex === -1)
+            throw new BusinessLogicException(`Review with id ${review}) is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
         
         await this.reviewRepository.remove(review);
         return review;

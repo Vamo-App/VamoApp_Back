@@ -293,6 +293,23 @@ export class ClientService {
         return newPost;
     }
 
+    async updatePost(clientId: string, postId: string, post:Post): Promise<Post> {
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
+        if (!client)
+            throw new BusinessLogicException(`Client with id ${clientId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const postFound = await this.postRepository.findOne({ where: {id: postId} });
+        if (!postFound)
+            throw new BusinessLogicException(`Post with id ${postId} was not found`, HttpStatus.NOT_FOUND);
+
+        const postIndex = client.posts.findIndex(p => p.id === postFound.id);
+        if (postIndex === -1)
+            throw new BusinessLogicException(`Post with id ${postId} is not associated with client with id ${clientId}`, HttpStatus.PRECONDITION_FAILED);
+
+        const postUpdated = await this.postRepository.save({ ...postFound, ...post });
+        return postUpdated;
+    }
+
     async removePost(clientId: string, postId: string): Promise<Post> {
         const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
         if (!client)

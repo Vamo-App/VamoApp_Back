@@ -12,7 +12,7 @@ import { Place } from '../place/place.entity';
 import { Post as PostEntity } from '../post/post.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { ClientCreateDto, ClientUpdateDto } from './dto';
-import { PostCreateDto } from '../post/dto';
+import { PostCreateDto, PostUpdateDto } from '../post/dto';
 import { LocationDto } from '../shared/utils/location';
 
 @Controller('clients')
@@ -100,12 +100,18 @@ export class ClientController {
     }
 
     @Post(':clientId/posts')
-    async publishPost(@Param('clientId') clientId: string, @Body() postCreateDto: PostCreateDto): Promise<PostEntity> {
+    async publishPost(@Param('clientId') clientId: string, @Body() postDto: PostCreateDto): Promise<PostEntity> {
         const place: Place = new Place();
-        place.id = postCreateDto.placeId;
-        const post: PostEntity = plainToInstance(PostEntity, postCreateDto);
+        place.id = postDto.placeId;
+        const post: PostEntity = plainToInstance(PostEntity, postDto);
         post.place = place;
         return await this.service.publishPost(clientId, post);
+    }
+
+    @Put(':clientId/posts/:postId')
+    async updatePost(@Param('clientId') clientId: string, @Param('postId') postId: string, @Body() postDto: PostUpdateDto): Promise<PostEntity> {
+        const post: PostEntity = plainToInstance(PostEntity, postDto);
+        return await this.service.updatePost(clientId, postId, post);
     }
 
     @Delete(':clientId/posts/:postId')

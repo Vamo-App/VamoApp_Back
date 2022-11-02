@@ -86,13 +86,17 @@ export class PlaceController {
     }
 
     @Post(':placeId/tags/:tag')
-    async addTag(@Param('placeId') placeId: string, @Param('tag') tag: string): Promise<Place> {
+    async addTag(@Param('placeId') placeId: string, @Param('tag') tagTag: string): Promise<Place> {
+        const tag = new Tag();
+        tag.tag = tagTag;
         return await this.service.addTag(placeId, tag);
     }
 
     @Delete(':placeId/tags/:tag')
     @HttpCode(204)
-    async removeTag(@Param('placeId') placeId: string, @Param('tag') tag: string): Promise<Place> {
+    async removeTag(@Param('placeId') placeId: string, @Param('tag') tagTag: string): Promise<Place> {
+        const tag = new Tag();
+        tag.tag = tagTag;
         return await this.service.removeTag(placeId, tag);
     }
 
