@@ -15,12 +15,12 @@ export class Media extends BaseEntity {
     @Column()
     type: MediaType;
 
-    @ManyToOne(type => Event, event => event.medias, {
+    @ManyToOne(type => Event, event => event.media, {
         onDelete: 'CASCADE'
     })
     event: Event;
 
-    @ManyToOne(type => Place, place => place.medias, {
+    @ManyToOne(type => Place, place => place.media, {
         onDelete: 'CASCADE'
     })
     place: Place;

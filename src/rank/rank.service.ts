@@ -22,12 +22,12 @@ export class RankService {
     async create(rank: Rank): Promise<Rank> {
         const rankFound = await this.rankRepository.findOne({ where: { name: rank.name } });
         if (rankFound)
-            throw new BusinessLogicException(`Rank ${rank.name} already exists`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Rank ${rank.name} already exists`, HttpStatus.BAD_REQUEST);
 
         const previousRank = await this.rankRepository.findOne({ where: { level: rank.level - 1 } });
         if (!previousRank)
             if (rank.level !== 0)
-                throw new BusinessLogicException(`Previous rank (${rank.level - 1}) must exist`, HttpStatus.PRECONDITION_FAILED);
+                throw new BusinessLogicException(`Previous rank (${rank.level - 1}) must exist`, HttpStatus.BAD_REQUEST);
         
         const rankLevelFound = await this.rankRepository.findOne({ where: { level: rank.level } });
         if (rankLevelFound)

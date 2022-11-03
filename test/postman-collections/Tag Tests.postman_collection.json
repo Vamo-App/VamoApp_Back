@@ -81,13 +81,13 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/tags/rock",
+					"raw": "{{baseUrl}}/tags/electronic+music",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"tags",
-						"rock"
+						"electronic+music"
 					]
 				}
 			},
@@ -100,8 +100,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 412\", function () {\r",
-							"    pm.response.to.have.status(412);\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
 							"});"
 						],
 						"type": "text/javascript"

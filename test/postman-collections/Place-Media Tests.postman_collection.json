@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "b36f6525-242a-4767-9966-661955d265ec",
-		"name": "Place-Review Tests",
+		"_postman_id": "7a6d2064-0d08-4ca9-8bda-5df0e0b385eb",
+		"name": "Place-Media Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "18901686"
 	},
@@ -65,11 +65,6 @@
 							"    pm.expect(longitude).not.eq(undefined);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Place has tag 'disco'\", function() {\r",
-							"    var { tags } = pm.response.json();\r",
-							"    pm.expect(tags.findIndex(t => t.tag === \"disco\")).not.eq(-1);\r",
-							"});\r",
-							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
@@ -93,7 +88,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 58 #10-32\",\r\n    \"latitude\":4.644950383828928,\r\n    \"longitude\":-74.06378545993776,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
+					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 0 #0-0\",\r\n    \"latitude\":0.1,\r\n    \"longitude\":0.1,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -114,15 +109,14 @@
 			"response": []
 		},
 		{
-			"name": "Create client",
+			"name": "Add media to place",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"var data = pm.response.json()\r",
-							"pm.globals.set(\"clientId\", data.id);\r",
-							"pm.globals.set(\"clientEmail\", data.email);\r",
+							"pm.globals.set(\"mediaId\", data.id);\r",
 							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
@@ -147,7 +141,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\"\r\n    ]\r\n}",
+					"raw": "{\r\n    \"url\":\"mypic.com/place0\",\r\n    \"type\":\"IMAGE\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -155,182 +149,27 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/clients",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create review to place",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"reviewId\", data.id);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"stars\":1.5,\r\n    \"clientId\":\"{{clientId}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
+					"raw": "{{baseUrl}}/places/{{placeId}}/media",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews"
+						"media"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Create invalid review to place",
+			"name": "Get media of place",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {\r",
-							"    pm.response.to.have.status(400);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"stars\":0,\r\n    \"clientId\":\"{{clientId}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places",
-						"{{placeId}}",
-						"reviews"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update review of place",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"stars\":3.0\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews/{{reviewId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"places",
-						"{{placeId}}",
-						"reviews",
-						"{{reviewId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get reviews of a place",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Review list is not empty\", function () {\r",
+							"pm.test(\"Media list is not empty\", function () {\r",
 							"    var data = pm.response.json();\r",
 							"    pm.expect(data.length).to.greaterThan(0);\r",
 							"});\r",
@@ -369,21 +208,21 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
+					"raw": "{{baseUrl}}/places/{{placeId}}/media",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews"
+						"media"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Delete review from place",
+			"name": "Delete media of place",
 			"event": [
 				{
 					"listen": "test",
@@ -420,65 +259,15 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews/{{reviewId}}",
+					"raw": "{{baseUrl}}/places/{{placeId}}/media/{{mediaId}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews",
-						"{{reviewId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete a client",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
-							"    pm.response.to.have.status(204);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients",
-						"{{clientId}}"
+						"media",
+						"{{mediaId}}"
 					]
 				}
 			},

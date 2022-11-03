@@ -36,7 +36,7 @@ export class MissionService {
         const clients: Client[] = await this.clientRepository.find();
 
         if (mission.places && mission.places.length && mission.tag)
-            throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`A mission can't have both a tag and places`, HttpStatus.BAD_REQUEST);
 
         if (mission.places) {
             const realPlaces: Place[] = [];
@@ -50,7 +50,7 @@ export class MissionService {
         }
 
         if (mission.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
-            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.BAD_REQUEST);
 
         if (mission.tag) {
             let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
@@ -79,7 +79,7 @@ export class MissionService {
         if (!missionToUpdate)
             throw new BusinessLogicException(`The mission with the id ${missionId} was not found`, HttpStatus.NOT_FOUND);
         if (missionToUpdate.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
-            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.BAD_REQUEST);
 
         if (mission.places) {
             const realPlaces: Place[] = [];
@@ -93,7 +93,7 @@ export class MissionService {
         }
 
         if (missionToUpdate.type === MissionType.VISIT && (!(mission.places && mission.places.length) && !mission.tag))
-            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`A VISIT mission must have a tag or at least one place`, HttpStatus.BAD_REQUEST);
 
         if (mission.tag) {
             let tag: Tag = await this.tagRepository.findOne({ where: { tag: mission.tag.tag } });
@@ -128,9 +128,9 @@ export class MissionService {
             if (mission.base) {
                 mission.base = false;
                 await this.repository.save(mission);
-                throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client, instead 'base was set to false' (all the instances not completed were deleted)`, HttpStatus.PRECONDITION_FAILED);
+                throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client, instead 'base was set to false' (all the instances not completed were deleted)`, HttpStatus.BAD_REQUEST);
             }
-            throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client (all the instances not completed were deleted)`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`The mission with the id (${missionId}) couldn't be deleted because it was completed by at least one client (all the instances not completed were deleted)`, HttpStatus.BAD_REQUEST);
         }
         await this.repository.delete(missionId);
         throw new BusinessLogicException(`The mission with the id (${missionId}) was deleted, ${countDeleted} uncomplete instances were deleted`, HttpStatus.OK);

@@ -114,7 +114,7 @@ export class Place extends BaseEntity {
     placeMissions: Mission[];
 
     @OneToMany(type => Media, media => media.place)
-    medias: Media[];
+    media: Media[];
 
     @OneToMany(type => Event, event => event.place)
     events: Event[];

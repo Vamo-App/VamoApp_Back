@@ -96,7 +96,7 @@ export class PlaceService {
     }
 
     async getOne(placeId: string): Promise<Place> {
-        const place = await this.placeRepository.findOne({ where: {id: placeId} ,relations: ['tags', 'business', 'medias'] });
+        const place = await this.placeRepository.findOne({ where: {id: placeId} ,relations: ['tags', 'business', 'media'] });
         if (!place)
             throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
         return place;
@@ -114,7 +114,7 @@ export class PlaceService {
         // IMPORTANTE: Si NO se envían como parámetro 'longitude' y 'latitude', se hace la solicitud a una API externa LIMITADA. Si se conocen estos dos datos, es mejor enviarlos como parámetro
         if (place.longitude || place.latitude) {
             if (!place.longitude || !place.latitude) {
-                throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.PRECONDITION_FAILED);
+                throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.BAD_REQUEST);
             }
             else {
                 place.addressLabel = place.address;
@@ -185,7 +185,7 @@ export class PlaceService {
         // ya no se hace un llamado a la API externa, simplemente se modifican los atributos que se envíen, es decir se toma la latitud, longitud, dirección, etc. que se envíen
         if (place.longitude || place.latitude) {
             if (!place.longitude || !place.latitude)
-                throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.PRECONDITION_FAILED);
+                throw new BusinessLogicException(`The fields 'longitude' and 'latitude' must be sent together`, HttpStatus.BAD_REQUEST);
         }
 
         place.addressLabel = place.address;
@@ -227,7 +227,7 @@ export class PlaceService {
 
         const tagIndex = place.tags.findIndex(t => t.tag === tagFound.tag)
         if (tagIndex === -1)
-            throw new BusinessLogicException(`Tag with name ${tag.tag} is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Tag with name ${tag.tag} is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
         
         place.tags.splice(tagIndex, 1);
         const placeUpdated = await this.placeRepository.save(place);
@@ -330,10 +330,9 @@ export class PlaceService {
 
         const reviewIndex = place.reviews.findIndex(r => r.id === reviewFound.id);
         if (reviewIndex === -1)
-            throw new BusinessLogicException(`Review with id ${reviewId} is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Review with id ${reviewId} is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
 
-        const reviewUpdated = await this.reviewRepository.save({ ...reviewFound, ...review });
-        return reviewUpdated;
+        return await this.reviewRepository.save({ ...reviewFound, ...review });
     }
 
     async deleteReview(placeId: string, reviewId: string): Promise<Review> {
@@ -347,44 +346,103 @@ export class PlaceService {
         
         const reviewIndex = place.reviews.findIndex(r => r.id === review.id);
         if (reviewIndex === -1)
-            throw new BusinessLogicException(`Review with id ${review}) is not associated with place with id ${placeId}`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Review with id ${review}) is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
         
         await this.reviewRepository.remove(review);
         return review;
     }
 
     async getEvents(placeId: string): Promise<Event[]> {
-        // TODO T
-        return ;
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['events'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        if (!place.events.length)
+            throw new BusinessLogicException(`Place with id ${placeId} has no events`, HttpStatus.NO_CONTENT);
+        return place.events;
     }
     
     async addEvent(placeId: string, event: Event): Promise<Event> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['events'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        event.place = place;
+        event.startDate = new Date(event.startDate);
+        event.endDate = new Date(event.endDate);
+        if (event.startDate < new Date()) 
+            throw new BusinessLogicException(`The event start date must be a future date`, HttpStatus.BAD_REQUEST);
+        if (event.endDate <= event.startDate) 
+            throw new BusinessLogicException(`The event end date must be after the start date`, HttpStatus.BAD_REQUEST);
+        const newEvent = await this.eventRepository.save(event);
+        return newEvent;
     }
 
     async updateEvent(placeId: string, eventId: string, event: Event): Promise<Event> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['events'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        const eventFound = await this.eventRepository.findOne({ where: {id: eventId} });
+        if (!eventFound)
+            throw new BusinessLogicException(`Event with id ${eventId} was not found`, HttpStatus.NOT_FOUND);
+        const eventIndex = place.events.findIndex(e => e.id === eventFound.id);
+        if (eventIndex === -1)
+            throw new BusinessLogicException(`Event with id ${eventId} is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
+
+        if (eventFound.endDate < new Date())
+            throw new BusinessLogicException(`The event has already finished and cannot be modified`, HttpStatus.BAD_REQUEST);
+
+        event.startDate = event.startDate ? new Date(event.startDate) : eventFound.startDate;
+        event.endDate = event.endDate ? new Date(event.endDate) : eventFound.endDate;
+
+        if (event.startDate < new Date())
+            throw new BusinessLogicException(`The event start date must be a future date`, HttpStatus.BAD_REQUEST);
+        if (event.endDate <= event.startDate)
+            throw new BusinessLogicException(`The event end date must be after the start date`, HttpStatus.BAD_REQUEST);
+        
+        return await this.eventRepository.save({ ...eventFound, ...event });
     }
 
     async deleteEvent(placeId: string, eventId: string): Promise<Event> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['events'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        const event = await this.eventRepository.findOne({ where: {id: eventId} });
+        if (!event)
+            throw new BusinessLogicException(`Event with id ${eventId} was not found`, HttpStatus.NOT_FOUND);
+        const eventIndex = place.events.findIndex(e => e.id === event.id);
+        if (eventIndex === -1)
+            throw new BusinessLogicException(`Event with id ${eventId} is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
+        await this.eventRepository.remove(event);
+        return event;
     }
 
     async getMedia(placeId: string): Promise<Media[]> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['media'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        if (!place.media.length)
+            throw new BusinessLogicException(`Place with id ${placeId} has no media`, HttpStatus.NO_CONTENT);
+        return place.media;
     }
 
     async addMedia(placeId: string, media: Media): Promise<Media> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['media'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        media.place = place;
+        return await this.mediaRepository.save(media);
     }
 
     async deleteMedia(placeId: string, mediaId: string): Promise<Media> {
-        // TODO T
-        return ;
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['media'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        const media = await this.mediaRepository.findOne({ where: {id: mediaId} });
+        if (!media)
+            throw new BusinessLogicException(`Media with id ${mediaId} was not found`, HttpStatus.NOT_FOUND);
+        const mediaIndex = place.media.findIndex(m => m.id === media.id);
+        if (mediaIndex === -1)
+            throw new BusinessLogicException(`Media with id ${mediaId} is not associated with place with id ${placeId}`, HttpStatus.BAD_REQUEST);
+        await this.mediaRepository.remove(media);
+        return media;
     }
 }

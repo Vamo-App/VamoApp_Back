@@ -34,5 +34,5 @@ export class Event extends BaseEntity {
     place: Place;
 
     @OneToMany(type => Media, media => media.event)
-    medias: Media[];
+    media: Media[];
 }

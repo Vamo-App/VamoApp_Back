@@ -17,11 +17,17 @@ export class TagController {
 
     @Post(':tag')
     async create(@Param('tag') tag: string): Promise<Tag> {
+        tag = tag.replace(/ /g, '+');
+        tag = tag.replace(/\+/g, ' ');
         return await this.service.create(tag);
     }
 
     @Put(':tag')
     async update(@Param('tag') tag: string, @Query('tag') newTag: string): Promise<Tag> {
+        tag = tag.replace(/ /g, '+');
+        tag = tag.replace(/\+/g, ' ');
+        newTag = newTag.replace(/ /g, '+');
+        newTag = newTag.replace(/\+/g, ' ');
         return await this.service.update(tag, newTag);
     }
 

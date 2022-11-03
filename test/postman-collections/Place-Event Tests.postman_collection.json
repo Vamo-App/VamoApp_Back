@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "b36f6525-242a-4767-9966-661955d265ec",
-		"name": "Place-Review Tests",
+		"_postman_id": "37ef66fb-40c2-48f5-99db-a52dbcaaa6b8",
+		"name": "Place-Event Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "18901686"
 	},
@@ -65,11 +65,6 @@
 							"    pm.expect(longitude).not.eq(undefined);\r",
 							"});\r",
 							"\r",
-							"pm.test(\"Place has tag 'disco'\", function() {\r",
-							"    var { tags } = pm.response.json();\r",
-							"    pm.expect(tags.findIndex(t => t.tag === \"disco\")).not.eq(-1);\r",
-							"});\r",
-							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
@@ -93,7 +88,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 58 #10-32\",\r\n    \"latitude\":4.644950383828928,\r\n    \"longitude\":-74.06378545993776,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
+					"raw": "{\r\n    \"name\":\"Theatron de Película\",\r\n    \"country\":\"Colombia\",\r\n    \"state\":\"Bogotá D.C.\",\r\n    \"city\":\"Bogotá\",\r\n    \"neighborhood\":\"Chapinero\",\r\n    \"address\":\"Cl. 0 #0-0\",\r\n    \"latitude\":0.1,\r\n    \"longitude\":0.1,\r\n    \"tags\":[\r\n        \"bar\",\r\n        \"disco\",\r\n        \"dance\",\r\n        \"colorful\",\r\n        \"homo\",\r\n        \"drink\"\r\n    ],\r\n    \"instagram\":\"https://www.instagram.com/theatronbogota/\",\r\n    \"radius\":0.010\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -114,15 +109,14 @@
 			"response": []
 		},
 		{
-			"name": "Create client",
+			"name": "Add event to place",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
 							"var data = pm.response.json()\r",
-							"pm.globals.set(\"clientId\", data.id);\r",
-							"pm.globals.set(\"clientEmail\", data.email);\r",
+							"pm.globals.set(\"eventId\", data.id);\r",
 							"\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
@@ -147,7 +141,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\"\r\n    ]\r\n}",
+					"raw": "{\r\n    \"title\":\"The event of the year\",\r\n    \"description\":\"Come and eat your favourite plates with 15% disccount\",\r\n    \"type\":\"Food Event\",\r\n    \"startDate\":\"2023-05-30T15:00-05:00\",\r\n    \"endDate\":\"2023-05-31\",\r\n    \"url\":\"myevent.com/place0\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -155,73 +149,75 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/clients",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create review to place",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"reviewId\", data.id);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"stars\":1.5,\r\n    \"clientId\":\"{{clientId}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews"
+						"events"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Create invalid review to place",
+			"name": "Add event to place 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"eventId2\", data.id);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\":\"The event of the year\",\r\n    \"description\":\"Come and eat your favourite plates with 15% disccount\",\r\n    \"type\":\"Food Event\",\r\n    \"startDate\":\"2023-06-01\",\r\n    \"endDate\":\"2023-06-30T18:00-05:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId}}/events",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{placeId}}",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add invalid event to place",
 			"event": [
 				{
 					"listen": "test",
@@ -250,7 +246,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"stars\":0,\r\n    \"clientId\":\"{{clientId}}\"\r\n}",
+					"raw": "{\r\n    \"title\":\"The event of the year\",\r\n    \"description\":\"Come and eat your favourite plates with 15% disccount\",\r\n    \"type\":\"Food Event\",\r\n    \"startDate\":\"2023-06-01\",\r\n    \"endDate\":\"2023-05-30T18:00-05:00\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -258,21 +254,125 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews"
+						"events"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Update review of place",
+			"name": "Update invalid event of place",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"endDate\":\"2023-05-30T14:00-05:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId}}/events/{{eventId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{placeId}}",
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update invalid event of place 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startDate\":\"2023-07-01T12:00-05:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/places/{{placeId}}/events/{{eventId2}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{placeId}}",
+						"events",
+						"{{eventId2}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update event of place",
 			"event": [
 				{
 					"listen": "test",
@@ -301,7 +401,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"stars\":3.0\r\n}",
+					"raw": "{\r\n    \"endDate\":\"2023-05-30T18:00-05:00\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -309,28 +409,28 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews/{{reviewId}}",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events/{{eventId}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews",
-						"{{reviewId}}"
+						"events",
+						"{{eventId}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get reviews of a place",
+			"name": "Get events of place",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Review list is not empty\", function () {\r",
+							"pm.test(\"Media list is not empty\", function () {\r",
 							"    var data = pm.response.json();\r",
 							"    pm.expect(data.length).to.greaterThan(0);\r",
 							"});\r",
@@ -369,21 +469,21 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews"
+						"events"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Delete review from place",
+			"name": "Delete event of place 2",
 			"event": [
 				{
 					"listen": "test",
@@ -420,22 +520,22 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/places/{{placeId}}/reviews/{{reviewId}}",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events/{{eventId2}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"places",
 						"{{placeId}}",
-						"reviews",
-						"{{reviewId}}"
+						"events",
+						"{{eventId2}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Delete a client",
+			"name": "Delete event of place",
 			"event": [
 				{
 					"listen": "test",
@@ -472,13 +572,15 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}",
+					"raw": "{{baseUrl}}/places/{{placeId}}/events/{{eventId}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"clients",
-						"{{clientId}}"
+						"places",
+						"{{placeId}}",
+						"events",
+						"{{eventId}}"
 					]
 				}
 			},

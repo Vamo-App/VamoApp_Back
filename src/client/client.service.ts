@@ -43,7 +43,7 @@ export class ClientService {
     async register(client: Client): Promise<Client> {
         const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
         if (clientFound)
-            throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.BAD_REQUEST);
 
         // settear el rango 0 por defecto, si no existe, crearlo
         let rank = await this.rankRepository.findOne({ where: { level:0 } });
@@ -113,7 +113,7 @@ export class ClientService {
         if (client.email && client.email !== clientToUpdate.email) {
             const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
             if (clientFound)
-                throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
+                throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.BAD_REQUEST);
         }
 
         return await this.clientRepository.save({...clientToUpdate, ...client});
@@ -290,7 +290,7 @@ export class ClientService {
 
         const postIndex = client.posts.findIndex(p => p.id === postFound.id);
         if (postIndex === -1)
-            throw new BusinessLogicException(`Post with id ${postId} is not associated with client with id ${clientId}`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Post with id ${postId} is not associated with client with id ${clientId}`, HttpStatus.BAD_REQUEST);
 
         const postUpdated = await this.postRepository.save({ ...postFound, ...post });
         return postUpdated;

@@ -22,7 +22,7 @@ export class TagService {
     async create(tag: string): Promise<Tag> {
         const existentTag = await this.tagRepository.findOne({ where: { tag } });
         if (existentTag)
-            throw new BusinessLogicException(`Tag ${tag} already exists`, HttpStatus.PRECONDITION_FAILED);
+            throw new BusinessLogicException(`Tag ${tag} already exists`, HttpStatus.BAD_REQUEST);
         const newTag = new Tag();
         newTag.tag = tag;
         return await this.tagRepository.save(newTag);
