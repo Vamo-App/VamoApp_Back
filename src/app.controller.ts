@@ -32,7 +32,7 @@ export class AppController {
     return this.appService.getHello();
   }
   
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async authlogin(@Request() req) {
       return this.authService.login(req.user);
