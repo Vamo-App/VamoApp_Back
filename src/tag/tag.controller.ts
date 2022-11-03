@@ -31,7 +31,7 @@ export class TagController {
         return await this.service.update(tag, newTag);
     }
 
-    @Delete(':tag')
+    @Delete(':tag') 
     @HttpCode(204)
     async delete(@Param('tag') tag: string): Promise<void> {
         return await this.service.delete(tag);
