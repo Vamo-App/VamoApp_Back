@@ -135,12 +135,12 @@ export class PlaceService {
                     });
             if (status !== 200) {
                 this.log.error(`Error status ${status} when calling PositionStack API`, response, getStackTrace(), 'Create Place');
-                throw new BusinessLogicException(`Error in the request`, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new BusinessLogicException(`Error in the request. Please try again and if the error persist, contact the admin.`, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             if (!response || !response.data || !response.data[0] || !response.data[0].latitude || !response.data[0].longitude) {
-                this.log.warn(`The address '${fullAddress}' was not found by PositionStack API`, response, 'Create Place');
-                throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
+                this.log.warn(`The address '${fullAddress}' was not found by PositionStack API. Endpoint '${fetchUrl}'`, response, 'Create Place');
+                throw new BusinessLogicException(`The address '${fullAddress}' was not found. Please try again and if the error persist, contact the admin.`, HttpStatus.NOT_FOUND);
             }
             
             let i: number = 0;
@@ -155,7 +155,7 @@ export class PlaceService {
 
                 if (i === -1) {
                     this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but any was found in the country`, response, 'Create Place');
-                    throw new BusinessLogicException(`The address '${fullAddress}' was not found`, HttpStatus.NOT_FOUND);
+                    throw new BusinessLogicException(`The address '${fullAddress}' was not found. Please try again and if the error persist, contact the admin.`, HttpStatus.NOT_FOUND);
                 } else {
                     this.log.warn(`More than one occurrences for '${fullAddress}' in PositionStack API, but at least one found in the country`, response, 'Create Place');
                 }

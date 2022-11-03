@@ -40,15 +40,15 @@ export const planeText = (text: string): string => {
     return text;
 }
 
-export const appendToLogFile = (fileName: string, log: string):void => {
+export const appendToLogFile = (logFile: string, log: string): void => {
     const fs = require('fs');
     const path = require('path');
-    const logPath = path.join(__dirname, '..', '..', 'logs');
+    const logPath = path.join(process.cwd(), 'logs');
     if (!fs.existsSync(logPath)) {
         fs.mkdirSync(logPath);
     }
-    const filePath = path.join(logPath, fileName);
-    fs.appendFileSync(filePath, log);
+    const logFilePath = path.join(logPath, logFile);
+    fs.appendFileSync(logFilePath, log);
 }
 
 export const sendLogEmail = (logHtmlString: string):string|void => {
