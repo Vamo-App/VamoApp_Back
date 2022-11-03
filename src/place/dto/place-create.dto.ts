@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsOptional, IsNotEmpty, IsString, IsUrl, ArrayNotEmpty, IsNumber, IsEnum, Min } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsUrl, ArrayNotEmpty, IsNumber, IsEnum, Min, IsUUID } from 'class-validator';
 import { Country } from '../../shared/enums/country.enum';
 
 export class PlaceCreateDto {
@@ -64,7 +64,7 @@ export class PlaceCreateDto {
     @IsOptional()
     readonly tiktok: string;
 
-    @IsString()
+    @IsUUID()
     @IsOptional()
     readonly businessId: string;
 

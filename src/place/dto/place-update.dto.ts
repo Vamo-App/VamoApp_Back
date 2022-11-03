@@ -62,8 +62,4 @@ export class PlaceUpdateDto {
     @IsUrl()
     @IsOptional()
     readonly tiktok: string;
-
-    @IsString()
-    @IsOptional()
-    readonly businessId: string;
 }

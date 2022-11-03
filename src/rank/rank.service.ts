@@ -29,13 +29,6 @@ export class RankService {
             if (rank.level !== 0)
                 throw new BusinessLogicException(`Previous rank (${rank.level - 1}) must exist`, HttpStatus.PRECONDITION_FAILED);
         
-        /* // ya lo verifica el pipe con whitelist 
-        for (const item in rank) {
-            if (['clients'].findIndex(x => x === item) !== -1)
-                if (rank[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
-        }*/
-        
         const rankLevelFound = await this.rankRepository.findOne({ where: { level: rank.level } });
         if (rankLevelFound)
             // move all ranks with level >= rank.level to level + 1
@@ -53,12 +46,6 @@ export class RankService {
         if (!rankToUpdate)
             throw new BusinessLogicException(`Rank ${rankName} was not found`, HttpStatus.NOT_FOUND);
         
-        /* // ya lo verifica el pipe con whitelist 
-        for (const item in rank) {
-            if (['clients', 'level'].findIndex(x => x === item) !== -1)
-                if (rank[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually modified`, HttpStatus.FORBIDDEN);
-        }*/
         rankToUpdate = { ...rankToUpdate, ...rank }
         await this.rankRepository.update(rankName, rankToUpdate);
         return rankToUpdate;

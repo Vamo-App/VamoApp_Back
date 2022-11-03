@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "bc1b223c-a9c8-431e-a88b-f548dfd23b2a",
-		"name": "Client-Post Tests",
+		"_postman_id": "03ea1eb9-4503-4178-87af-6dcf5a41d465",
+		"name": "Place-Post Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "18901686"
 	},
@@ -44,110 +44,6 @@
 					"path": [
 						"auth",
 						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create rank 0",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"rankName\", data.name);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"First\",\r\n    \"level\":0,\r\n    \"xpNext\":1000\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/ranks",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ranks"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create rank 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"rankName2\", data.name);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Second\",\r\n    \"level\":1,\r\n    \"xpNext\":2000\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/ranks",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ranks"
 					]
 				}
 			},
@@ -265,58 +161,6 @@
 			"response": []
 		},
 		{
-			"name": "Create post mission (no base)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"missionId\", data.id);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\":\"Publish 2 posts\",\r\n    \"description\":\"Let everyone know how cool you are!\",\r\n    \"prizeXp\":1200,\r\n    \"base\":false,\r\n    \"type\":\"POST\",\r\n    \"requiredN\":2\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/missions",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"missions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Publish post",
 			"event": [
 				{
@@ -350,60 +194,6 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"picture\":\"mypic.com/user\",\r\n    \"description\":\"Such a nice place to party!\",\r\n    \"placeId\":\"{{placeId}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}/posts",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients",
-						"{{clientId}}",
-						"posts"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Publish post 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var data = pm.response.json()\r",
-							"pm.globals.set(\"postId2\", data.id);\r",
-							"\r",
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"picture\":\"mypic2.com/user\",\r\n    \"description\":\"My best party\",\r\n    \"placeId\":\"{{placeId}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -477,7 +267,7 @@
 			"response": []
 		},
 		{
-			"name": "Get posts of a client",
+			"name": "Get posts of a place",
 			"event": [
 				{
 					"listen": "test",
@@ -522,124 +312,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}/posts",
+					"raw": "{{baseUrl}}/places/{{placeId}}/posts",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"clients",
-						"{{clientId}}",
+						"places",
+						"{{placeId}}",
 						"posts"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get client",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Client leveled up (level=1)\", function () {\r",
-							"    var rank = pm.response.json().rank;\r",
-							"    pm.expect(rank.level).to.equal(1);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients",
-						"{{clientId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete post 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
-							"    pm.response.to.have.status(204);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/clients/{{clientId}}/posts/{{postId2}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"clients",
-						"{{clientId}}",
-						"posts",
-						"{{postId2}}"
 					]
 				}
 			},
@@ -748,56 +428,6 @@
 			"response": []
 		},
 		{
-			"name": "Delete mission of deleted client",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/missions/{{missionId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"missions",
-						"{{missionId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Delete a place",
 			"event": [
 				{
@@ -842,88 +472,6 @@
 					"path": [
 						"places",
 						"{{placeId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete rank 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
-							"    pm.response.to.have.status(204);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/ranks/{{rankName2}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ranks",
-						"{{rankName2}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete rank 0",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {\r",
-							"    pm.response.to.have.status(204);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/ranks/{{rankName}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ranks",
-						"{{rankName}}"
 					]
 				}
 			},

@@ -1,4 +1,4 @@
-import { IsOptional, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsUrl, IsUUID } from 'class-validator';
 
 export class PostCreateDto {
     @IsString()
@@ -9,7 +9,7 @@ export class PostCreateDto {
     @IsNotEmpty()
     readonly picture: string;
 
-    @IsString()
+    @IsUUID()
     @IsNotEmpty()
     readonly placeId: string;
 }

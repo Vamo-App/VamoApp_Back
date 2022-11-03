@@ -70,12 +70,7 @@ export class PlaceController {
 
     @Put(':placeId')
     async update(@Param('placeId') placeId: string, @Body() placeDto: PlaceUpdateDto): Promise<Place> {
-        const { businessId } = placeDto;
         const place = plainToInstance(Place, placeDto);
-        if (businessId) {
-            place.business = new Business();
-            place.business.id = businessId;
-        }
         return await this.service.update(placeId, place);
     }
 
@@ -86,13 +81,17 @@ export class PlaceController {
     }
 
     @Post(':placeId/tags/:tag')
-    async addTag(@Param('placeId') placeId: string, @Param('tag') tag: string): Promise<Place> {
+    async addTag(@Param('placeId') placeId: string, @Param('tag') tagTag: string): Promise<Place> {
+        const tag = new Tag();
+        tag.tag = tagTag;
         return await this.service.addTag(placeId, tag);
     }
 
     @Delete(':placeId/tags/:tag')
     @HttpCode(204)
-    async removeTag(@Param('placeId') placeId: string, @Param('tag') tag: string): Promise<Place> {
+    async removeTag(@Param('placeId') placeId: string, @Param('tag') tagTag: string): Promise<Place> {
+        const tag = new Tag();
+        tag.tag = tagTag;
         return await this.service.removeTag(placeId, tag);
     }
 

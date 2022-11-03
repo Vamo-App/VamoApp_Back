@@ -45,14 +45,6 @@ export class ClientService {
         if (clientFound)
             throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
 
-        /* // ya lo verifica el pipe con whitelist
-        for (const item in client) {
-            if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1) {
-                if (client[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually set`, HttpStatus.FORBIDDEN);
-            }
-        }*/
-
         // settear el rango 0 por defecto, si no existe, crearlo
         let rank = await this.rankRepository.findOne({ where: { level:0 } });
         if (!rank) {
@@ -124,12 +116,6 @@ export class ClientService {
                 throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.PRECONDITION_FAILED);
         }
 
-        /* // ya lo verifica el pipe con whitelist
-        for (const item in client) {
-            if (['id', 'xp', 'rank', 'missions', 'posts', 'reviews', 'pending', 'liked'].findIndex(x => x === item) !== -1)
-                if (client[item])
-                    throw new BusinessLogicException(`The field ${item} cannot be manually modified`, HttpStatus.FORBIDDEN);
-        }*/
         return await this.clientRepository.save({...clientToUpdate, ...client});
     }
 
@@ -291,6 +277,23 @@ export class ClientService {
 
         newPost.client = clientUpdated;
         return newPost;
+    }
+
+    async updatePost(clientId: string, postId: string, post:Post): Promise<Post> {
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['posts'] });
+        if (!client)
+            throw new BusinessLogicException(`Client with id ${clientId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const postFound = await this.postRepository.findOne({ where: {id: postId} });
+        if (!postFound)
+            throw new BusinessLogicException(`Post with id ${postId} was not found`, HttpStatus.NOT_FOUND);
+
+        const postIndex = client.posts.findIndex(p => p.id === postFound.id);
+        if (postIndex === -1)
+            throw new BusinessLogicException(`Post with id ${postId} is not associated with client with id ${clientId}`, HttpStatus.PRECONDITION_FAILED);
+
+        const postUpdated = await this.postRepository.save({ ...postFound, ...post });
+        return postUpdated;
     }
 
     async removePost(clientId: string, postId: string): Promise<Post> {

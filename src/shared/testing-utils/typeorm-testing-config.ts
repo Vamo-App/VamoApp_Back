@@ -12,6 +12,7 @@ import { Mission } from '../../mission/mission.entity';
 import { MissionClient } from '../../mission-client/mission-client.entity';
 import { Post } from '../../post/post.entity';
 import { Log } from '../../log/log.entity';
+import { LogModule } from '../../log/log.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -28,5 +29,6 @@ export const TypeOrmTestingConfig = () => [
     synchronize: true,
     keepConnectionAlive: true
   }),
+  LogModule,
   TypeOrmModule.forFeature([Client, Weight, Tag, Place, Business, Rank, Media, EventEntity, Review, Mission, MissionClient, Post, Log]),
 ];

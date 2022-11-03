@@ -1,4 +1,4 @@
-import { IsOptional, IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsNumber, Min, Max, IsUUID } from 'class-validator';
 
 export class ReviewCreateDto {
     @IsString()
@@ -6,10 +6,12 @@ export class ReviewCreateDto {
     readonly text: string;
 
     @IsNumber()
+    @Min(1)
+    @Max(5)
     @IsNotEmpty()
     readonly stars: number;
 
-    @IsString()
+    @IsUUID()
     @IsNotEmpty()
     readonly clientId: string;
 }
