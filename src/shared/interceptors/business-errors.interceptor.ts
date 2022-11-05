@@ -8,10 +8,18 @@ export class BusinessErrorsInterceptor implements NestInterceptor {
             .pipe(catchError(error => {
                 if (error.httpStatus)
                     throw new HttpException(error.message, error.httpStatus);
-                if (error.code)
-                    throw new HttpException(`Internal server error [${error.code}]: ${error.detail ? error.detail : error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
-                else
-                    throw error;
+
+                const { code } = error;
+                if (code) {
+                    switch (code) {
+                        case '22P02':
+                            throw new HttpException(`Not valid ID`, HttpStatus.BAD_REQUEST);
+                        default:
+                            throw new HttpException(`Internal server error [${error.code}]: ${error.detail ? error.detail : error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                }
+
+                throw error;
             }));
     }
 }
