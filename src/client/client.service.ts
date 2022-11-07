@@ -110,7 +110,7 @@ export class ClientService {
         if (!clientToUpdate)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
 
-        if (client.email && client.email !== clientToUpdate.email) {
+        if (client.email && (client.email !== clientToUpdate.email)) {
             const clientFound = await this.clientRepository.findOne({ where: {email: client.email} });
             if (clientFound)
                 throw new BusinessLogicException(`The client with the email (${client.email}) already exists`, HttpStatus.BAD_REQUEST);
