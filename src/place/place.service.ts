@@ -235,13 +235,32 @@ export class PlaceService {
     }
 
     async associateBusiness(placeId: string, businessId: string): Promise<Place> {
-        // TODO T
-        return ;
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['business'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const business: Business = await this.businessRepository.findOne({ where: {id: businessId} });
+        if (!business)
+            throw new BusinessLogicException(`Business with id ${businessId} was not found`, HttpStatus.NOT_FOUND);
+        
+        place.business = business;
+        return this.placeRepository.save(place);
     }
 
     async dissociateBusiness(placeId: string, businessId: string): Promise<Place> {
-        // TODO T
-        return ;
+        const place: Place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['business'] });
+        if (!place)
+            throw new BusinessLogicException(`Place with id ${placeId} was not found`, HttpStatus.NOT_FOUND);
+        
+        const business: Business = await this.businessRepository.findOne({ where: {id: businessId} });
+        if (!business)
+            throw new BusinessLogicException(`Business with id ${businessId} was not found`, HttpStatus.NOT_FOUND);
+
+        if (!place.business || (place.business.id !== business.id))
+            throw new BusinessLogicException(`Invalid business`, HttpStatus.BAD_REQUEST);
+        
+        place.business = null;
+        return this.placeRepository.save(place);
     }
 
     async getPosts(placeId: string): Promise<Post[]> {
