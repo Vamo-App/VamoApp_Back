@@ -18,6 +18,8 @@ import { MediaModule } from './media/media.module';
 import { VamoUserModule } from './vamo-user/vamo-user.module';
 import { AuthModule } from './auth/auth.module';
 import { LogModule } from './log/log.module';
+import { Client } from './client/client.entity';
+import { Business } from './business/business.entity';
 
 @Module({
   imports: [
@@ -51,6 +53,7 @@ import { LogModule } from './log/log.module';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
+    TypeOrmModule.forFeature([Client, Business])
   ],
   controllers: [AppController],
   providers: [AppService],

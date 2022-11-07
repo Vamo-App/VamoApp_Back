@@ -1,13 +1,17 @@
-import { Controller, Post, Get, Request, UseGuards, Res, Param } from '@nestjs/common';
+import { Controller, Post, Get, Request, UseGuards, Res, Param, Body, UseInterceptors } from '@nestjs/common';
 import { Response } from 'express';
+import { BusinessErrorsInterceptor } from './shared/interceptors/business-errors.interceptor';
+import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AppService } from './app.service';
 import { Place } from './place/place.entity';
 import { Client } from './client/client.entity';
 import { Business } from './business/business.entity';
+import { CredentialsDto } from './shared/utils/credentials';
 
 @Controller()
+@UseInterceptors(BusinessErrorsInterceptor, TransformInterceptor)
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -22,10 +26,14 @@ export class AppController {
     return ;
   }
 
-  @Get('login')
-  async login(): Promise<Client|Business> {
-    //TODO B
-    return ;
+  @Get('login/client')
+  async loginClient(@Body() credentials: CredentialsDto): Promise<Client> {
+    return this.appService.loginClient(credentials);
+  }
+
+  @Get('login/business')
+  async loginBusiness(@Body() credentials: CredentialsDto): Promise<Business> {
+    return this.appService.loginBusiness(credentials);
   }
 
   @Get('')
