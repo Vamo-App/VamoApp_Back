@@ -31,8 +31,9 @@ export class AppService {
   async vamo(clientIds: string[], longitude: number, latitude: number, radius: number ): Promise<Place[]> {
     let client: Client[] = [];
     let place: Place[] = [];
+    var HashTable = require('hashtable');
     for (let i = 0; i < clientIds.length; i++) {
-      client.push(await this.clientRepository.findOne({where: {id: clientIds[i]},relations: ['weights',"tags"] })); 
+      client.push(await this.clientRepository.findOne({where: {id: clientIds[i]},relations: ['weights',"weights.tag"] })); 
     }
     for (let i = 0; i < client.length; i++) {
       let cliente: Client = client[i];
