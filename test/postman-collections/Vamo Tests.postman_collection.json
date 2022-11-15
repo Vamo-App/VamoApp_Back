@@ -57,9 +57,17 @@
 					"script": {
 						"exec": [
 							"var data = pm.response.json()\r",
-							"pm.globals.set(\"clientId\", data.id);\r",
-							"pm.globals.set(\"clientEmail\", data.email);\r",
 							"\r",
+							"if (pm.globals.get(\"clientIds\") == undefined || pm.globals.get(\"clientIds\") == null ){\r",
+							"    \r",
+							"    let ids =[\"\\\"\"+data.id+\"\\\"\"]\r",
+							"    pm.globals.set(\"clientIds\", ids);\r",
+							"}\r",
+							"else{\r",
+							"    let a=pm.globals.get(\"clientIds\")\r",
+							"    a.push(\"\\\"\"+data.id+\"\\\"\")\r",
+							"    pm.globals.set(\"clientIds\", a);\r",
+							"}\r",
 							"pm.test(\"Status code is 201\", function () {\r",
 							"    pm.response.to.have.status(201);\r",
 							"});"
@@ -93,7 +101,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\":\"{{email}}\",\r\n    \"name\":\"{{name}}\",\r\n    \"password\":\"{{password}}\" ,\r\n    \"picture\":\"{{picture}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"tags\":[{{tags}}]\r\n\r\n}",
+					"raw": "{\r\n    \"email\":\"{{email}}\",\r\n    \"name\":\"{{name}}\",\r\n    \"password\":\"{{password}}\" ,\r\n    \"picture\":\"{{picture}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"tags\":[{{tags}}]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -107,6 +115,65 @@
 					],
 					"path": [
 						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vamo!",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.globals.unset(\"clientIds\")"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(pm.globals.get(\"clientIds\"))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clients\":[{{clientIds}}],\r\n    \"longitude\":\"-74.18692300543852\",\r\n    \"latitude\":\"4.593594368348899\",\r\n    \"radius\":5\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/vamo",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"vamo"
 					]
 				}
 			},

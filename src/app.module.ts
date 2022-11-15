@@ -25,7 +25,9 @@ import { Business } from './business/business.entity';
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     ClientModule, 
+
     WeightModule, 
+
     TagModule, 
     RankModule, 
     MissionClientModule, 
@@ -57,5 +59,6 @@ import { Business } from './business/business.entity';
   ],
   controllers: [AppController],
   providers: [AppService],
+
 })
 export class AppModule {}
