@@ -19,11 +19,9 @@ export class AppController {
   ) {}
 
   @Get('vamo')
-  async vamo(): Promise<Place[]> {
-    //TODO O
-    //TODO B
-    //TODO D
-    return ;
+  async vamo(@Body() payload: any): Promise<Place[]> {
+    const { clients, longitude, latitude, radius } = payload;
+    return await this.appService.vamo(clients, +longitude, +latitude, +radius);
   }
 
   @Get('login/client')

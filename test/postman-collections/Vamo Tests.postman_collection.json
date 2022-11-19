@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "c5fd9c88-b9dc-40c0-b07c-55c1496681ae",
+		"name": "Vamo Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24301889"
+	},
+	"item": [
+		{
+			"name": "Get auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"pm.globals.set(\"token\", data.token);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create clients",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json()\r",
+							"\r",
+							"if (pm.globals.get(\"clientIds\") == undefined || pm.globals.get(\"clientIds\") == null ){\r",
+							"    \r",
+							"    let ids =[\"\\\"\"+data.id+\"\\\"\"]\r",
+							"    pm.globals.set(\"clientIds\", ids);\r",
+							"}\r",
+							"else{\r",
+							"    let a=pm.globals.get(\"clientIds\")\r",
+							"    a.push(\"\\\"\"+data.id+\"\\\"\")\r",
+							"    pm.globals.set(\"clientIds\", a);\r",
+							"}\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"{{email}}\",\r\n    \"name\":\"{{name}}\",\r\n    \"password\":\"{{password}}\" ,\r\n    \"picture\":\"{{picture}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"tags\":[{{tags}}]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vamo!",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.globals.unset(\"clientIds\")"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(pm.globals.get(\"clientIds\"))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clients\":[{{clientIds}}],\r\n    \"longitude\":\"-74.18692300543852\",\r\n    \"latitude\":\"4.593594368348899\",\r\n    \"radius\":5\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/vamo",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"vamo"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

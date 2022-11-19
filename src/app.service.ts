@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { Client } from './client/client.entity';
 import { Business } from './business/business.entity';
 import { CredentialsDto } from './shared/utils/credentials';
+import { Place } from './place/place.entity';
+import { Weight } from './weight/weight.entity';
 
 @Injectable()
 export class AppService {
@@ -25,6 +27,23 @@ export class AppService {
       throw new BusinessLogicException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
     return client;
+  }
+  async vamo(clientIds: string[], longitude: number, latitude: number, radius: number ): Promise<Place[]> {
+    let client: Client[] = [];
+    let place: Place[] = [];
+    var HashTable = require('hashtable');
+    for (let i = 0; i < clientIds.length; i++) {
+      client.push(await this.clientRepository.findOne({where: {id: clientIds[i]},relations: ['weights',"weights.tag"] })); 
+    }
+    for (let i = 0; i < client.length; i++) {
+      let cliente: Client = client[i];
+      let Weight: Weight[] = cliente.weights;
+      for (let j = 0; j < Weight.length; j++) {
+        console.log(Weight[j].tag.tag);
+      }
+    }
+    
+    return place; 
   }
 
   async loginBusiness(credentials: CredentialsDto): Promise<Business> {
