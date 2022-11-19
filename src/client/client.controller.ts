@@ -29,7 +29,7 @@ export class ClientController {
             const w:Weight = new Weight();
             w.tag = new Tag();
             w.tag.tag = tag;
-            w.weight = 1; // asigna un peso inicial del 100% a cada tag seleccionado por el cliente
+            w.weight = 1/ tags.length;
             return w;
         });
         return await this.service.register(client);
