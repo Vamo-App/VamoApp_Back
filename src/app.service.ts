@@ -15,7 +15,9 @@ export class AppService {
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
     @InjectRepository(Business)
-    private readonly businessRepository: Repository<Business>
+    private readonly businessRepository: Repository<Business>,
+    @InjectRepository(Place)
+    private readonly placeRepository: Repository<Place>
   ) {}
 
   async loginClient(credentials: CredentialsDto): Promise<Client> {
@@ -41,10 +43,12 @@ export class AppService {
     longitude: number,
     latitude: number,
     radius: number
+    
   ): Promise<Place[]> {
     let client: Client[] = [];
     let place: Place[] = [];
     let HashTable = new Map();
+    let best_tags = [];
     for (let i = 0; i < clientIds.length; i++) {
       client.push(
         await this.clientRepository.findOne({
@@ -62,14 +66,32 @@ export class AppService {
         let peso = Weight[j].weight;
         if (HashTable.has(tag)) {
           let value = HashTable.get(tag);
-          HashTable.set(tag, value + peso);
+          HashTable.set(tag, value + peso/client.length);
         } else {
-          HashTable.set(tag, peso);
+          HashTable.set(tag, peso/client.length);
         }
       }
     }
-    console.log(HashTable);
-    return place;
+    best_tags = Array.from(HashTable.entries()).sort((a, b) => b[1] - a[1]);
+    let places_in_order = [];
+    let ids:String[] = [];
+    for (let i = 0; i < best_tags.length; i++) {
+      let tag = best_tags[i][0];
+      let places = await this.placeRepository
+        .createQueryBuilder("place")
+        .leftJoinAndSelect("place.tags", "tags")
+        .where(':tag IN (SELECT ptp."tagTag" FROM tag_places_place ptp where ptp."placeId"=place.id)', {tag: tag})
+        .getMany();
+      for (let j = 0; j < places.length; j++) {
+        let place = places[j];
+        if ( ids.indexOf(place.id) == -1) {
+          places_in_order.push(place)
+          ids.push(place.id);
+        }
+      }
+    }
+    
+    return places_in_order;
   }
 
   async loginBusiness(credentials: CredentialsDto): Promise<Business> {

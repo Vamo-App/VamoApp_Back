@@ -1,0 +1,60 @@
+[
+    {
+        "name":"Theatron de Película",
+        "country":"Colombia",
+        "state":"Bogotá D.C.",
+        "city":"Bogotá",
+        "neighborhood":"Chapinero",
+        "address":"Cl. 58 #10-32",
+        "latitude":4.644950383828928,
+        "longitude":-74.06378545993776,
+        "tags":[
+            "\"bar\"",
+            "\"disco\"",
+            "\"dance\"",
+            "\"colorful\"",
+            "\"homo\"",
+            "\"drink\""
+        ],
+        "instagram":"https://www.instagram.com/theatronbogota/",
+        "radius":0.010
+    },
+    {
+        "name":"Restaurante Vegetariano Om Shanti",
+        "country":"Colombia",
+        "state":"Bogotá D.C.",
+        "city":"Bogotá",
+        "neighborhood":"Puente Aranda",
+        "address":"Ak. 50 #39A-51",
+        "latitude":4.595113223815641,
+        "longitude":-74.12653349347532,
+        "tags":[
+            "\"indian\"",
+            "\"comida\"",
+            "\"restaurant\"",
+            "\"colorful\"",
+            "\"drink\""
+        ],
+        "instagram":"https://www.instagram.com/",
+        "radius":0.010
+    },
+    {
+        "name":"MR. Rock",
+        "country":"Colombia",
+        "state":"Bogotá D.C.",
+        "city":"Bogotá",
+        "neighborhood":"La Estancia",
+        "address":"Cra 72, Cl. 58 Sur #62",
+        "latitude":4.590268834114279,
+        "longitude":-74.16714541241967,
+        "tags":[
+            "\"rock\"",
+            "\"bar\"",
+            "\"drink\"",
+            "\"restaurant\""
+        ],
+        "instagram":"https://www.instagram.com/mr.rockco/?igshid=YmMyMTA2M2Y%3D",
+        "radius":0.010
+    }
+]
+

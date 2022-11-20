@@ -22,5 +22,17 @@
         "\"restaurant\"",
         "\"family\""
     ]
+},
+{
+    "email": "User9@EMAIL.COM",
+    "name": "Test User",
+    "password": "Password ",
+    "picture": "mypic.com/testuser",
+    "description": "such a place lover!",
+    "tags": [
+        "\"amistad\"",
+        "\"rock\"",
+        "\"bar\""
+    ]
 }
 ]

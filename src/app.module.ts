@@ -20,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
 import { LogModule } from './log/log.module';
 import { Client } from './client/client.entity';
 import { Business } from './business/business.entity';
+import { Place } from './place/place.entity';
 
 @Module({
   imports: [
@@ -55,7 +56,7 @@ import { Business } from './business/business.entity';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       migrationsRun: true
     }),
-    TypeOrmModule.forFeature([Client, Business])
+    TypeOrmModule.forFeature([Client, Business, Place]) 
   ],
   controllers: [AppController],
   providers: [AppService],
