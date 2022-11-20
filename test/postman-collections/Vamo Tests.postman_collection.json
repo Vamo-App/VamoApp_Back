@@ -127,9 +127,21 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"var data = pm.response.json()\r",
+							"if (pm.globals.get(\"placesIds\") == undefined || pm.globals.get(\"placesIds\") == null ){\r",
+							"    let ids =[\"\\\"\"+data.id+\"\\\"\"]\r",
+							"    pm.globals.set(\"placesIds\", ids);\r",
+							"}\r",
+							"else{\r",
+							"    let a=pm.globals.get(\"placesIds\")\r",
+							"    a.push(\"\\\"\"+data.id+\"\\\"\")\r",
+							"    pm.globals.set(\"placesIds\", a);\r",
+							"}\r",
 							"pm.test(\"Successful POST request\", function () {\r",
 							"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);\r",
-							"});"
+							"});\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -181,6 +193,43 @@
 							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
+							"let client = pm.globals.get(\"clientIds\");\r",
+							"let places = pm.globals.get(\"placesIds\");\r",
+							"\r",
+							"function createData(DATA){\r",
+							"    let json_response_delete_client= []\r",
+							"    for (let x in DATA) {\r",
+							"        let ids= {\"id\":DATA[x].replace(\"\\\"\",\"\").replace(\"\\\"\",\"\")}\r",
+							"        json_response_delete_client.push(ids)\r",
+							"    };\r",
+							"    return json_response_delete_client;\r",
+							"};\r",
+							"let data_client = createData(client)\r",
+							"let data_places = createData(places)\r",
+							"function myFunction(data,name) {\r",
+							"    let opts = {\r",
+							"    requestName: name,\r",
+							"    fileExtension: 'json',\r",
+							"    mode: 'writeFile', // Change this to any function of the fs library of node to use it.\r",
+							"    uniqueIdentifier: false,\r",
+							"    responseData: JSON.stringify(data)\r",
+							"    };\r",
+							"    pm.sendRequest({\r",
+							"        url: 'http://localhost:8000/write',\r",
+							"        method: 'POST',\r",
+							"        header: 'Content-Type:application/json',\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify(opts)\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        console.log(res);\r",
+							"    });\r",
+							"}\r",
+							"myFunction(data_client,\"delete_client\")\r",
+							"myFunction(data_places,\"delete_places\")\r",
+							"pm.globals.unset(\"clientIds\");\r",
+							"pm.globals.unset(\"placesIds\");\r",
 							""
 						],
 						"type": "text/javascript"
@@ -214,7 +263,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"clients\":[{{clientIds}}],\r\n    \"longitude\":-74.18692300543852,\r\n    \"latitude\":4.593594368348899,\r\n    \"radius\":5\r\n}",
+					"raw": "{\r\n    \"clients\":[{{clientIds}}],\r\n    \"longitude\":-74.19847239138225,\r\n    \"latitude\":4.589304207013122,\r\n    \"radius\":10\r\n}\r\n\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -228,6 +277,106 @@
 					],
 					"path": [
 						"vamo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete clients",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/clients/{{id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"clients",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete places",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/places/{{id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"places",
+						"{{id}}"
 					]
 				}
 			},

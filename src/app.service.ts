@@ -8,7 +8,7 @@ import { Business } from "./business/business.entity";
 import { CredentialsDto } from "./shared/utils/credentials";
 import { Place } from "./place/place.entity";
 import { Weight } from "./weight/weight.entity";
-
+import { distance } from './shared/utils/functions';
 @Injectable()
 export class AppService {
   constructor(
@@ -46,7 +46,6 @@ export class AppService {
     
   ): Promise<Place[]> {
     let client: Client[] = [];
-    let place: Place[] = [];
     let HashTable = new Map();
     let best_tags = [];
     for (let i = 0; i < clientIds.length; i++) {
@@ -82,6 +81,14 @@ export class AppService {
         .leftJoinAndSelect("place.tags", "tags")
         .where(':tag IN (SELECT ptp."tagTag" FROM tag_places_place ptp where ptp."placeId"=place.id)', {tag: tag})
         .getMany();
+      places = places.filter( (place) => {
+        let distance_ = distance(place.latitude, place.longitude, latitude, longitude);
+        if (distance_ <= radius) {
+          console.log(place.name)
+          console.log(distance_)
+        }
+        return distance_ <= radius
+      });
       for (let j = 0; j < places.length; j++) {
         let place = places[j];
         if ( ids.indexOf(place.id) == -1) {
@@ -90,7 +97,7 @@ export class AppService {
         }
       }
     }
-    
+
     return places_in_order;
   }
 
