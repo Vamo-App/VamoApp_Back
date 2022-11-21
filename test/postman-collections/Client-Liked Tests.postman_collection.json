@@ -136,7 +136,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\"\r\n    ]\r\n}",
+					"raw": "{\r\n    \"email\":\"User1@EMAIL.COM\",\r\n    \"name\":\"Test User\",\r\n    \"password\":\"Password \",\r\n    \"picture\":\"mypic.com/testuser\",\r\n    \"description\":\"such a place lover!\",\r\n    \"tags\":[\r\n        \"indian\",\r\n        \"restaurant\",\r\n        \"family\",\r\n        \"liked\"\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

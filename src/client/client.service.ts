@@ -13,7 +13,7 @@ import { Review } from '../review/review.entity';
 import { MissionClient } from '../mission-client/mission-client.entity';
 import { Rank } from '../rank/rank.entity';
 import { LocationDto } from '../shared/utils/location';
-import { entitiesConstants } from '../shared/utils/constants';
+import { entitiesConstants, maximumUncertainity } from '../shared/utils/constants';
 import { MissionType } from '../shared/enums/mission-type.enum';
 import { LogService } from '../log/log.service';
 import { planeText, distance, getStackTrace } from '../shared/utils/functions';
@@ -145,32 +145,37 @@ export class ClientService {
     }
 
     async addPending(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights', 'weights.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations:['tags'] });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
+        if (client.pending.some(p => p.id === place.id))
+            throw new BusinessLogicException(`The place with the id (${placeId}) is already pending`, HttpStatus.BAD_REQUEST);
         client.pending.push(place);
 
-        // TODO B actualizar los pesos del cliente
-
         await this.clientRepository.save(client);
+        await this.addWeights(client, place);
+
         return place;
     }
 
     async removePending(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['pending', 'weights', 'weights.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations: ['tags'] });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
+        const index = client.pending.findIndex(p => p.id === place.id);
+        if (index === -1)
+            throw new BusinessLogicException(`The place with the id (${placeId}) is not pending for the client with the id (${clientId})`, HttpStatus.NOT_FOUND);
         client.pending = client.pending.filter(p => p.id !== place.id);
 
-        // TODO B actualizar los pesos del cliente
-
         await this.clientRepository.save(client);
+        await this.removeWeights(client, place);
+
         return place;
     }
 
@@ -184,32 +189,37 @@ export class ClientService {
     }
 
     async addLiked(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights', 'weights.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations:['tags'] });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
+        if (client.liked.some(p => p.id === place.id))
+            throw new BusinessLogicException(`The place with the id (${placeId}) is already liked`, HttpStatus.BAD_REQUEST);
         client.liked.push(place);
 
-        // TODO B actualizar los pesos del cliente
-
         await this.clientRepository.save(client);
+        await this.addWeights(client, place);
+
         return place;
     }
 
     async removeLiked(clientId: string, placeId: string): Promise<Place> {
-        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights'] });
+        const client = await this.clientRepository.findOne({ where: {id: clientId}, relations: ['liked', 'weights', 'weights.tag'] });
         if (!client)
             throw new BusinessLogicException(`The client with the id (${clientId}) was not found`, HttpStatus.NOT_FOUND);
-        const place = await this.placeRepository.findOne({ where: {id: placeId} });
+        const place = await this.placeRepository.findOne({ where: {id: placeId}, relations:['tags'] });
         if (!place)
             throw new BusinessLogicException(`The place with the id (${placeId}) was not found`, HttpStatus.NOT_FOUND);
+        const index = client.liked.findIndex(p => p.id === place.id);
+        if (index === -1)
+            throw new BusinessLogicException(`The place with the id (${placeId}) is not liked for the client with the id (${clientId})`, HttpStatus.NOT_FOUND);
         client.liked = client.liked.filter(p => p.id !== place.id);
 
-        // TODO B actualizar los pesos del cliente
-
         await this.clientRepository.save(client);
+        await this.removeWeights(client, place);
+
         return place;
     }
 
@@ -401,4 +411,65 @@ export class ClientService {
 
         return missionsAccomplished;
     }
+
+    private async addWeights(client: Client, place: Place): Promise<void> {
+        const n = Math.round(1/Math.min(...client.weights.map(w => w.weight)));
+        const N = n + place.tags.length;
+        let checksum = 0;
+        client.weights.forEach(w => {
+            const idx = place.tags.findIndex(t => t.tag === w.tag.tag);
+            if (idx === -1) {
+                w.weight = (w.weight * n) / N;
+            } else {
+                w.weight = (w.weight * n + 1) / N;
+                place.tags.splice(idx, 1);
+            }
+            w.client = client;
+            this.weightRepository.save(w);
+            checksum += w.weight;
+        });
+
+        place.tags.forEach(t => {
+            const w = new Weight();
+            w.weight = 1 / N;
+            w.tag = t;
+            w.client = client;
+            this.weightRepository.save(w);
+            checksum += w.weight;
+        });
+
+        if (Math.abs(checksum - 1) > maximumUncertainity) {
+            const error = new BusinessLogicException(`The sum of the weights is not 1 (${checksum})`, HttpStatus.INTERNAL_SERVER_ERROR);
+            this.log.fatal(`The sum of the weights of client (${client.id}) is not 1 (${checksum})`, error, getStackTrace(), 'Add pendig/liked to client');
+        }
+    }
+
+    private async removeWeights(client: Client, place: Place): Promise<void> {
+        const N = Math.round(1/Math.min(...client.weights.map(w => w.weight)));
+        const n = N - place.tags.length;
+
+        let checksum = 0;
+        client.weights.forEach(w => {
+            const idx = place.tags.findIndex(t => t.tag === w.tag.tag);
+            if (idx === -1) {
+                w.weight = (w.weight * N) / n;
+            } else {
+                w.weight = (w.weight * N - 1) / n;
+                place.tags.splice(idx, 1);
+            }
+            w.client = client;
+            if (w.weight < maximumUncertainity) {
+                this.weightRepository.remove(w);
+            } else {
+                this.weightRepository.save(w);
+            }
+            checksum += w.weight;
+        });
+
+        if (Math.abs(checksum - 1) > maximumUncertainity) {
+            const error = new BusinessLogicException(`The sum of the weights is not 1 (${checksum})`, HttpStatus.INTERNAL_SERVER_ERROR);
+            this.log.fatal(`The sum of the weights of client (${client.id}) is not 1 (${checksum})`, error, getStackTrace(), 'Remove pendig/liked to client');
+        }
+    }
+    
 }
