@@ -415,8 +415,9 @@ export class ClientService {
     private async addWeights(client: Client, place: Place): Promise<void> {
         const n = Math.round(1/Math.min(...client.weights.map(w => w.weight)));
         const N = n + place.tags.length;
+
         let checksum = 0;
-        client.weights.forEach(w => {
+        for (const w of client.weights) {
             const idx = place.tags.findIndex(t => t.tag === w.tag.tag);
             if (idx === -1) {
                 w.weight = (w.weight * n) / N;
@@ -425,18 +426,18 @@ export class ClientService {
                 place.tags.splice(idx, 1);
             }
             w.client = client;
-            this.weightRepository.save(w);
+            await this.weightRepository.save(w);
             checksum += w.weight;
-        });
+        }
 
-        place.tags.forEach(t => {
+        for (const t of place.tags) {
             const w = new Weight();
             w.weight = 1 / N;
             w.tag = t;
             w.client = client;
-            this.weightRepository.save(w);
+            await this.weightRepository.save(w);
             checksum += w.weight;
-        });
+        }
 
         if (Math.abs(checksum - 1) > maximumUncertainity) {
             const error = new BusinessLogicException(`The sum of the weights is not 1 (${checksum})`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -449,7 +450,7 @@ export class ClientService {
         const n = N - place.tags.length;
 
         let checksum = 0;
-        client.weights.forEach(w => {
+        for (const w of client.weights) {
             const idx = place.tags.findIndex(t => t.tag === w.tag.tag);
             if (idx === -1) {
                 w.weight = (w.weight * N) / n;
@@ -459,12 +460,12 @@ export class ClientService {
             }
             w.client = client;
             if (w.weight < maximumUncertainity) {
-                this.weightRepository.remove(w);
+                await this.weightRepository.remove(w);
             } else {
-                this.weightRepository.save(w);
+                await this.weightRepository.save(w);
             }
             checksum += w.weight;
-        });
+        }
 
         if (Math.abs(checksum - 1) > maximumUncertainity) {
             const error = new BusinessLogicException(`The sum of the weights is not 1 (${checksum})`, HttpStatus.INTERNAL_SERVER_ERROR);
