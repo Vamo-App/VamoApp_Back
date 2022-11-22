@@ -50,7 +50,6 @@ import { Place } from './place/place.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
-      dropSchema: true,
       synchronize: true,
       keepConnectionAlive: true,
       migrations: [__dirname + '/migrations/*.{js,ts}'],
